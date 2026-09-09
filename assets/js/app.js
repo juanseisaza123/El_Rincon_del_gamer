@@ -1257,15 +1257,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const minimizeBtn = visorComunidad.querySelector('.window-minimize-btn');
-        minimizeBtn.addEventListener('click', () => {
-             visorComunidad.classList.toggle('minimized');
-             const icon = minimizeBtn.querySelector('i');
-             if (visorComunidad.classList.contains('minimized')) {
-                 icon.className = 'fa-regular fa-square';
-             } else {
-                 icon.className = 'fa-solid fa-minus';
-             }
-        });
+        if (minimizeBtn) {
+            minimizeBtn.addEventListener('click', () => {
+                visorComunidad.classList.toggle('minimized');
+                const icon = minimizeBtn.querySelector('i');
+                if (icon) icon.className = visorComunidad.classList.contains('minimized') ? 'fa-regular fa-square' : 'fa-solid fa-minus';
+            });
+        }
 
         makeDraggable(visorComunidad);
         
@@ -1293,56 +1291,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // =========================================================
-    // MODULO ACADEMIA GAMER (BACKEND EXPRESS EN PUERTO 3000)
-    // =========================================================
-    const API_BASE = "http://localhost:3000";
-    const backendStatusBadge = document.getElementById('backendStatusBadge');
-    const statusLabel = document.getElementById('statusLabel');
-    const studentsListGrid = document.getElementById('studentsListGrid');
-    const studentCountBadge = document.getElementById('studentCountBadge');
-    const formAddStudent = document.getElementById('formAddStudent');
-    const studentSearchInput = document.getElementById('studentSearchInput');
-    const btnSearchStudent = document.getElementById('btnSearchStudent');
-    const btnReloadStudents = document.getElementById('btnReloadStudents');
-
-    // Modals
-    const editStudentModal = document.getElementById('editStudentModal');
-    const closeEditStudentModal = document.getElementById('closeEditStudentModal');
-    const cancelEditStudentBtn = document.getElementById('cancelEditStudentBtn');
-    const formEditStudent = document.getElementById('formEditStudent');
-
-    // Helper: Rank CSS class
-    const getRankClass = (rank) => {
-        if (!rank) return 'rank-iniciado';
-        const r = rank.toLowerCase().replace(/\s+/g, '-');
-        return `rank-${r}`;
-    };
-
-    // Verificar Estado del Servidor
-    const checkBackendStatus = async () => {
-        if (!backendStatusBadge) return false;
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2500);
-            const res = await fetch(`${API_BASE}/estudiantes`, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            if (res.ok) {
-                backendStatusBadge.className = 'backend-status-badge status-online';
-                if (statusLabel) statusLabel.textContent = 'Backend Online (Puerto 3000)';
-                return true;
-            } else {
-                throw new Error('Status not ok');
-            }
-        } catch (err) {
-            backendStatusBadge.className = 'backend-status-badge status-offline';
-            if (statusLabel) statusLabel.textContent = 'Backend Desconectado';
-            return false;
-        }
-    };
-
-    // Renderizar tarjetas de estudiantes
+    /*
+    // Código legado retirado: módulo de estudiantes.
     const renderStudents = (students) => {
         if (!studentsListGrid) return;
 
@@ -1585,5 +1535,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Carga inicial
     checkBackendStatus();
-});
+    */
 
+    // Acciones de navegación y contenido interactivo
+    const activateSection = (sectionId) => {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+        document.querySelectorAll('.feed-section:not(#visor-comunidad)').forEach(item => item.classList.remove('active'));
+        section.classList.add('active');
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.target === sectionId);
+        });
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    document.querySelectorAll('.sidebar-item[data-target="principal"]').forEach(item => {
+        item.addEventListener('click', (event) => {
+            const label = item.textContent.toLowerCase();
+            if (label.includes('crear')) {
+                event.preventDefault();
+                activateSection('principal');
+                document.getElementById('postTextArea')?.focus();
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-course').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (newsModalTitle) newsModalTitle.textContent = button.dataset.title;
+            if (newsModalBadge) newsModalBadge.textContent = 'Curso ERG';
+            if (newsModalImage) newsModalImage.style.backgroundImage = "linear-gradient(135deg, #0051ff, #9d00ff)";
+            if (newsModalContent) {
+                newsModalContent.innerHTML = `<p>${escapeHTML(button.dataset.content || '')}</p><p style="margin-top: 15px;">Guarda este curso en tus favoritos y aplica lo aprendido en tu próxima publicación.</p>`;
+            }
+            newsModal?.classList.add('active');
+        });
+    });
+
+    document.querySelectorAll('.explore-action').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const query = button.dataset.query;
+            if (query === 'publicar') {
+                activateSection('principal');
+                document.getElementById('postTextArea')?.focus();
+                showToast('Escribe tu publicación y compártela con la comunidad.', 'linear-gradient(135deg, var(--accent-primary), #0051ff)');
+                return;
+            }
+            if (query === 'comunidades') {
+                const communities = JSON.parse(localStorage.getItem('erg_communities') || '[]');
+                if (communities.length) {
+                    showToast(`Tienes ${communities.length} comunidad(es) disponible(s) en el menú lateral.`, 'linear-gradient(135deg, var(--accent-primary), #0051ff)');
+                } else {
+                    activateSection('comunidad');
+                    showToast('Crea tu primera comunidad desde este formulario.', 'linear-gradient(135deg, var(--accent-primary), #0051ff)');
+                }
+                return;
+            }
+            const posts = document.querySelectorAll('.post-card:not(.community-post)');
+            if (posts.length) {
+                posts[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showToast('Mostrando publicaciones de la comunidad.', 'linear-gradient(135deg, var(--accent-primary), #0051ff)');
+            } else {
+                activateSection('principal');
+                showToast('Todavía no hay publicaciones. ¡Sé el primero en compartir!', 'linear-gradient(135deg, var(--accent-primary), #0051ff)');
+            }
+        });
+    });
+});

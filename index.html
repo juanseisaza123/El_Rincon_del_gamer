@@ -305,7 +305,7 @@
                             <h3>Cómo hacer un stream profesional</h3>
                             <p>Aprende a configurar OBS y mejorar la calidad e interacción de tus streamings con
                                 nuestros expertos.</p>
-                            <a href="#" class="news-link">Ver curso <i class="fa-solid fa-play"></i></a>
+                            <a href="#" class="news-link btn-course" data-title="Cómo hacer un stream profesional" data-content="Aprende a configurar OBS, organizar tus escenas y mejorar la calidad de audio y video. Este curso incluye una ruta práctica para comenzar tu primer directo.">Ver curso <i class="fa-solid fa-play"></i></a>
                         </div>
                     </article>
 
@@ -319,20 +319,29 @@
                             <h3>Publicar en el foro como un experto</h3>
                             <p>Domina el formato, las reglas de la comunidad y estrategias para crear hilos de enorme
                                 interacción.</p>
-                            <a href="#" class="news-link">Ver curso <i class="fa-solid fa-play"></i></a>
+                            <a href="#" class="news-link btn-course" data-title="Publicar en el foro como un experto" data-content="Aprende a crear publicaciones claras, usar etiquetas, compartir capturas y participar respetuosamente en las comunidades de ERG.">Ver curso <i class="fa-solid fa-play"></i></a>
                         </div>
                     </article>
                 </div>
             </div>
 
-            <!-- Sección Explorar (Empty State) -->
+            <!-- Sección Explorar -->
             <div id="explorar" class="feed-section">
-                <div class="empty-state">
-                    <i class="fa-solid fa-compass empty-icon"></i>
-                    <h2>Explorar</h2>
-                    <p>Descubre nuevas comunidades, juegos en tendencia y creadores de contenido recomendados para ti.
-                    </p>
-                    <button class="btn-publish mt-2">Ver Tendencias</button>
+                <h2 class="section-title"><i class="fa-solid fa-compass"></i> Explorar</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Descubre contenido, juegos y comunidades recomendadas para ti.</p>
+                <div class="news-grid" id="exploreGrid">
+                    <article class="news-card explore-card">
+                        <div class="news-image" style="background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop');"><span class="news-badge">Tendencia</span></div>
+                        <div class="news-content"><h3>Juegos más comentados</h3><p>Encuentra las publicaciones con más actividad de la comunidad.</p><button class="news-link explore-action" data-query="juegos">Ver publicaciones <i class="fa-solid fa-arrow-right"></i></button></div>
+                    </article>
+                    <article class="news-card explore-card">
+                        <div class="news-image" style="background-image: url('https://images.unsplash.com/photo-1542751110-97427bbecf20?q=80&w=1200&auto=format&fit=crop');"><span class="news-badge">Comunidades</span></div>
+                        <div class="news-content"><h3>Comunidades nuevas</h3><p>Visita tus comunidades creadas y descubre nuevos espacios.</p><button class="news-link explore-action" data-query="comunidades">Explorar comunidades <i class="fa-solid fa-arrow-right"></i></button></div>
+                    </article>
+                    <article class="news-card explore-card">
+                        <div class="news-image" style="background-image: url('https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=1200&auto=format&fit=crop');"><span class="news-badge">Recomendado</span></div>
+                        <div class="news-content"><h3>Comparte tu próxima jugada</h3><p>Publica una actualización y participa en la conversación.</p><button class="news-link explore-action" data-query="publicar">Crear publicación <i class="fa-solid fa-pen"></i></button></div>
+                    </article>
                 </div>
             </div>
 
