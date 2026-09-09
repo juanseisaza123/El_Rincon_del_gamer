@@ -459,23 +459,39 @@
                         users: `
                             <div class="panel-card"><h2><i class="fa-solid fa-users" style="color: var(--admin-primary);"></i> Gestión de usuarios</h2>
                             <p style="color:#aaa;">Administra cuentas, estados y permisos de la comunidad.</p>
-                            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+                            <div style="display:flex; gap:12px; flex-wrap:wrap; margin:20px 0;">
                                 <button class="btn-action admin-view-action" data-action="users-list"><i class="fa-solid fa-list"></i> Ver usuarios</button>
                                 <button class="btn-action admin-view-action" data-action="users-new"><i class="fa-solid fa-user-plus"></i> Crear usuario</button>
                                 <button class="btn-action admin-view-action" data-action="users-export"><i class="fa-solid fa-download"></i> Exportar lista</button>
-                            </div></div>`,
+                            </div>
+                            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;">
+                                <div class="stat-card"><h3>42.5K</h3><p>Usuarios totales</p></div>
+                                <div class="stat-card"><h3>39.8K</h3><p>Activos</p></div>
+                                <div class="stat-card"><h3>2.7K</h3><p>En revisión</p></div>
+                            </div>
+                            <div id="usersExtraPanel" style="margin-top:20px;"></div></div>`,
                         communities: `
                             <div class="panel-card"><h2><i class="fa-solid fa-users-rectangle" style="color: var(--admin-secondary);"></i> Gestión de comunidades</h2>
                             <p style="color:#aaa;">Revisa la actividad y moderación de las comunidades creadas.</p>
-                            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+                            <div style="display:flex; gap:12px; flex-wrap:wrap; margin:20px 0;">
                                 <button class="btn-action admin-view-action" data-action="communities-list"><i class="fa-solid fa-list"></i> Ver comunidades</button>
                                 <button class="btn-action admin-view-action" data-action="communities-featured"><i class="fa-solid fa-star"></i> Destacadas</button>
+                                <button class="btn-action admin-view-action" data-action="communities-new"><i class="fa-solid fa-plus"></i> Nueva categoría</button>
+                            </div>
+                            <div id="communityExtraPanel" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px;">
+                                <div style="padding:18px; border:1px solid rgba(176,38,255,.35); border-radius:8px;"><strong>342</strong><br><small style="color:#aaa;">Comunidades activas</small></div>
+                                <div style="padding:18px; border:1px solid rgba(176,38,255,.35); border-radius:8px;"><strong>18</strong><br><small style="color:#aaa;">En moderación</small></div>
+                                <div style="padding:18px; border:1px solid rgba(176,38,255,.35); border-radius:8px;"><strong>7</strong><br><small style="color:#aaa;">Destacadas esta semana</small></div>
                             </div></div>`,
                         security: `
                             <div class="panel-card"><h2><i class="fa-solid fa-shield-halved" style="color:#76ff03;"></i> Seguridad</h2>
                             <p style="color:#aaa;">Estado de protección de la plataforma y controles de acceso.</p>
                             <div style="display:grid; gap:12px; margin-top:20px;">
                                 <div class="badge badge-active">Protección activa</div>
+                                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px;">
+                                    <div style="padding:16px; border:1px solid rgba(118,255,3,.3); border-radius:8px;"><strong>100%</strong><br><small style="color:#aaa;">Sesiones seguras</small></div>
+                                    <div style="padding:16px; border:1px solid rgba(118,255,3,.3); border-radius:8px;"><strong>0</strong><br><small style="color:#aaa;">Amenazas activas</small></div>
+                                </div>
                                 <div style="padding:14px; border:1px solid rgba(255,255,255,.1); border-radius:8px;">Última revisión: hoy · Autenticación y sesiones funcionando correctamente.</div>
                                 <button class="btn-action admin-view-action" data-action="security-review"><i class="fa-solid fa-magnifying-glass"></i> Ejecutar revisión</button>
                             </div></div>`,
@@ -483,6 +499,7 @@
                             <div class="panel-card"><h2><i class="fa-solid fa-triangle-exclamation" style="color:var(--admin-primary);"></i> Reportes pendientes</h2>
                             <p style="color:#aaa;">Hay 3 reportes que requieren revisión del administrador.</p>
                             <div style="display:grid; gap:12px; margin-top:20px;">
+                                <div style="display:flex; gap:10px; flex-wrap:wrap;"><button class="btn-action admin-view-action" data-action="reports-filter-all">Todos (3)</button><button class="btn-action admin-view-action" data-action="reports-filter-open">Pendientes (3)</button><button class="btn-action admin-view-action" data-action="reports-filter-closed">Resueltos (0)</button></div>
                                 <div style="padding:14px; border-left:3px solid var(--admin-primary); background:rgba(255,0,60,.08);">Reporte #103 · Contenido inapropiado <button class="btn-action admin-view-action" data-action="report-103" style="float:right;">Revisar</button></div>
                                 <div style="padding:14px; border-left:3px solid #ffeb3b; background:rgba(255,235,59,.08);">Reporte #102 · Spam repetitivo <button class="btn-action admin-view-action" data-action="report-102" style="float:right;">Revisar</button></div>
                                 <div style="padding:14px; border-left:3px solid #ffeb3b; background:rgba(255,235,59,.08);">Reporte #101 · Perfil sospechoso <button class="btn-action admin-view-action" data-action="report-101" style="float:right;">Revisar</button></div>
@@ -491,8 +508,10 @@
                             <div class="panel-card"><h2><i class="fa-solid fa-gear" style="color:#00f3ff;"></i> Ajustes del sistema</h2>
                             <p style="color:#aaa;">Configura opciones generales del centro de administración.</p>
                             <div style="display:grid; gap:16px; margin-top:20px;">
-                                <label style="display:flex; justify-content:space-between; align-items:center;">Modo mantenimiento <input type="checkbox" id="maintenanceToggle"></label>
-                                <label style="display:flex; justify-content:space-between; align-items:center;">Avisos automáticos <input type="checkbox" id="notificationsToggle" checked></label>
+                                <label style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid rgba(255,255,255,.1); border-radius:8px;">Modo mantenimiento <input type="checkbox" id="maintenanceToggle"></label>
+                                <label style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid rgba(255,255,255,.1); border-radius:8px;">Avisos automáticos <input type="checkbox" id="notificationsToggle" checked></label>
+                                <label style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid rgba(255,255,255,.1); border-radius:8px;">Registro de actividad <input type="checkbox" id="auditToggle" checked></label>
+                                <label style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid rgba(255,255,255,.1); border-radius:8px;">Límite de publicaciones por hora <input type="number" id="postLimitInput" value="60" min="1" max="500" style="width:80px; padding:6px; background:#111; color:#fff; border:1px solid #444; border-radius:4px;"></label>
                                 <button class="btn-action admin-view-action" data-action="settings-save"><i class="fa-solid fa-floppy-disk"></i> Guardar ajustes</button>
                             </div></div>`
                     };
@@ -501,14 +520,60 @@
                         button.addEventListener('click', () => {
                             const action = button.dataset.action;
                             if (action === 'users-new') {
-                                const username = window.prompt('Nombre del nuevo usuario:');
-                                if (username && username.trim()) notify(`Usuario "${username.trim()}" preparado para registro.`);
+                                const panel = document.getElementById('usersExtraPanel');
+                                if (panel) {
+                                    panel.innerHTML = `<div style="padding:18px; border:1px solid var(--admin-primary); border-radius:8px;"><h3 style="margin-top:0;">Nuevo usuario</h3><div style="display:grid; gap:10px;"><input id="newAdminUserName" placeholder="Nombre de usuario" style="padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:4px;"><input id="newAdminUserEmail" type="email" placeholder="Correo electrónico" style="padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:4px;"><button class="btn-action" id="saveNewAdminUser"><i class="fa-solid fa-check"></i> Guardar usuario</button></div></div>`;
+                                    document.getElementById('saveNewAdminUser').addEventListener('click', () => {
+                                        const name = document.getElementById('newAdminUserName').value.trim();
+                                        const email = document.getElementById('newAdminUserEmail').value.trim();
+                                        if (!name || !email) {
+                                            notify('Completa el nombre y el correo del usuario.');
+                                            return;
+                                        }
+                                        panel.innerHTML = `<div class="badge badge-active">Usuario ${name} creado (${email}).</div>`;
+                                        notify('Usuario creado correctamente.');
+                                    });
+                                }
                                 return;
+                            }
+                            if (action === 'users-list') {
+                                const panel = document.getElementById('usersExtraPanel');
+                                if (panel) panel.innerHTML = '<div style="padding:14px; border:1px solid rgba(255,255,255,.1); border-radius:8px;"><input placeholder="Filtrar usuarios..." style="width:100%; padding:10px; box-sizing:border-box; background:#111; color:#fff; border:1px solid #444; border-radius:4px;"><p style="color:#aaa;">DarkKnight88 · Activo<br>LegendarySniper · Activo<br>NoobMaster69 · Baneado</p></div>';
+                            }
+                            if (action === 'users-export') {
+                                const data = 'Usuario,Estado\nDarkKnight88,Activo\nLegendarySniper,Activo\nNoobMaster69,Baneado';
+                                const link = document.createElement('a');
+                                link.href = URL.createObjectURL(new Blob([data], { type: 'text/csv' }));
+                                link.download = 'usuarios-erg.csv';
+                                link.click();
+                            }
+                            if (action === 'communities-list' || action === 'communities-featured' || action === 'communities-new') {
+                                const panel = document.getElementById('communityExtraPanel');
+                                if (panel && action === 'communities-list') panel.innerHTML += '<div style="grid-column:1/-1; padding:14px; border:1px solid var(--admin-secondary); border-radius:8px;">Comunidad destacada: Cazadores de Trofeos · 1,248 miembros<br>Comunidad activa: ERG Valorant · 864 miembros</div>';
+                                if (panel && action === 'communities-featured') panel.innerHTML += '<div style="grid-column:1/-1; padding:14px; border:1px solid #ffeb3b; border-radius:8px;">Las comunidades destacadas se muestran primero en Explorar.</div>';
+                                if (panel && action === 'communities-new') panel.innerHTML += '<div style="grid-column:1/-1; padding:14px; border:1px solid var(--admin-secondary); border-radius:8px;"><input placeholder="Nombre de la nueva categoría" style="padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:4px;"><button class="btn-action" style="margin-left:8px;">Añadir</button></div>';
+                            }
+                            if (action === 'reports-filter-closed') {
+                                sectionView.querySelectorAll('[data-action^="report-"]').forEach(item => item.parentElement.style.display = 'none');
+                            }
+                            if (action === 'reports-filter-all' || action === 'reports-filter-open') {
+                                sectionView.querySelectorAll('[data-action^="report-"]').forEach(item => item.parentElement.style.display = '');
+                            }
+                            if (action.indexOf('report-') === 0) {
+                                const reportButton = button;
+                                reportButton.closest('div').style.opacity = '0.55';
+                                reportButton.textContent = 'En revisión';
+                                reportButton.disabled = true;
+                            }
+                            if (action === 'security-review') {
+                                button.parentElement.insertAdjacentHTML('beforebegin', '<div class="badge badge-active">Revisión completada: no se encontraron amenazas.</div>');
                             }
                             if (action === 'settings-save') {
                                 localStorage.setItem('erg_admin_settings', JSON.stringify({
                                     maintenance: document.getElementById('maintenanceToggle').checked,
-                                    notifications: document.getElementById('notificationsToggle').checked
+                                    notifications: document.getElementById('notificationsToggle').checked,
+                                    audit: document.getElementById('auditToggle').checked,
+                                    postLimit: document.getElementById('postLimitInput').value
                                 }));
                             }
                             notify(`Acción completada: ${button.textContent.trim()}.`);
