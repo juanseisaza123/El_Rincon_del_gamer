@@ -243,12 +243,12 @@
             <i class="fa-solid fa-bolt"></i> ERG ADMIN
         </div>
         <ul class="admin-menu">
-            <li><a href="#" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
-            <li><a href="#"><i class="fa-solid fa-users"></i> Usuarios</a></li>
-            <li><a href="#"><i class="fa-solid fa-users-rectangle"></i> Comunidades</a></li>
-            <li><a href="#"><i class="fa-solid fa-shield-halved"></i> Seguridad</a></li>
-            <li><a href="#"><i class="fa-solid fa-triangle-exclamation"></i> Reportes <span style="background: var(--admin-primary); color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-left: auto;">3</span></a></li>
-            <li><a href="#"><i class="fa-solid fa-gear"></i> Ajustes Sistema</a></li>
+            <li><a href="#" class="active" data-admin-section="dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="#" data-admin-section="users"><i class="fa-solid fa-users"></i> Usuarios</a></li>
+            <li><a href="#" data-admin-section="communities"><i class="fa-solid fa-users-rectangle"></i> Comunidades</a></li>
+            <li><a href="#" data-admin-section="security"><i class="fa-solid fa-shield-halved"></i> Seguridad</a></li>
+            <li><a href="#" data-admin-section="reports"><i class="fa-solid fa-triangle-exclamation"></i> Reportes <span style="background: var(--admin-primary); color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-left: auto;">3</span></a></li>
+            <li><a href="#" data-admin-section="settings"><i class="fa-solid fa-gear"></i> Ajustes Sistema</a></li>
         </ul>
         <div style="margin-top: auto; padding-top: 20px; font-size: 12px; color: #404040;">
             v1.2.0 Stable Build
@@ -257,12 +257,14 @@
 
     <main class="admin-main">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h1>Visión General <span style="font-size: 14px; font-weight: 400; color: #808080; margin-left: 15px;"><span class="live-indicator"></span> Sistema Online</span></h1>
+            <h1 id="adminPageTitle">Visión General <span style="font-size: 14px; font-weight: 400; color: #808080; margin-left: 15px;"><span class="live-indicator"></span> Sistema Online</span></h1>
             <div style="display: flex; gap: 15px;">
-                <button class="btn-action" title="Refrescar datos"><i class="fa-solid fa-rotate"></i></button>
-                <button class="btn-action" title="Mensaje Global"><i class="fa-solid fa-bullhorn"></i></button>
+                <button class="btn-action" id="refreshAdminData" title="Refrescar datos"><i class="fa-solid fa-rotate"></i></button>
+                <button class="btn-action" id="globalAdminMessage" title="Mensaje Global"><i class="fa-solid fa-bullhorn"></i></button>
             </div>
         </div>
+        <div id="adminActionMessage" role="status" style="display: none; margin: -15px 0 20px; padding: 12px 15px; border: 1px solid var(--admin-secondary); border-radius: 8px; color: #fff; background: rgba(176, 38, 255, 0.14);"></div>
+        <section id="adminSectionView" style="display: none;"></section>
 
         <section class="header-stats">
             <div class="stat-card">
@@ -318,8 +320,8 @@
                             <td><span class="badge badge-active">Activo</span></td>
                             <td>
                                 <div style="display: flex; gap: 5px;">
-                                    <button class="btn-action"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action"><i class="fa-solid fa-ban"></i></button>
+                                    <button class="btn-action user-edit-btn" title="Editar usuario"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn-action user-ban-btn" title="Cambiar estado"><i class="fa-solid fa-ban"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -337,8 +339,8 @@
                             <td><span class="badge badge-active">Activo</span></td>
                             <td>
                                 <div style="display: flex; gap: 5px;">
-                                    <button class="btn-action"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn-action"><i class="fa-solid fa-ban"></i></button>
+                                    <button class="btn-action user-edit-btn" title="Editar usuario"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn-action user-ban-btn" title="Cambiar estado"><i class="fa-solid fa-ban"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -356,7 +358,7 @@
                             <td><span class="badge badge-banned">Baneado</span></td>
                             <td>
                                 <div style="display: flex; gap: 5px;">
-                                    <button class="btn-action"><i class="fa-solid fa-undo"></i></button>
+                                    <button class="btn-action user-undo-btn" title="Restaurar usuario"><i class="fa-solid fa-undo"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -411,6 +413,173 @@
     <a href="../../../index.html" class="back-button">
         <i class="fa-solid fa-arrow-left-long"></i> Volver al Dashboard
     </a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageBox = document.getElementById('adminActionMessage');
+            const sectionView = document.getElementById('adminSectionView');
+            const dashboardSections = document.querySelectorAll('.header-stats, .management-grid');
+            let messageTimer;
+            const notify = (message) => {
+                if (!messageBox) return;
+                messageBox.textContent = message;
+                messageBox.style.display = 'block';
+                clearTimeout(messageTimer);
+                messageTimer = setTimeout(() => {
+                    messageBox.style.display = 'none';
+                }, 3500);
+            };
+
+            document.querySelectorAll('[data-admin-section]').forEach(link => {
+                link.addEventListener('click', event => {
+                    event.preventDefault();
+                    document.querySelectorAll('[data-admin-section]').forEach(item => item.classList.remove('active'));
+                    link.classList.add('active');
+                    const sectionNames = {
+                        dashboard: 'Dashboard',
+                        users: 'Usuarios',
+                        communities: 'Comunidades',
+                        security: 'Seguridad',
+                        reports: 'Reportes',
+                        settings: 'Ajustes del sistema'
+                    };
+                    const title = document.getElementById('adminPageTitle');
+                    if (title) title.firstChild.textContent = sectionNames[link.dataset.adminSection] + ' ';
+                    const section = link.dataset.adminSection;
+                    if (section === 'dashboard') {
+                        dashboardSections.forEach(item => item.style.display = '');
+                        sectionView.style.display = 'none';
+                        notify('Dashboard cargado.');
+                        return;
+                    }
+
+                    dashboardSections.forEach(item => item.style.display = 'none');
+                    sectionView.style.display = 'block';
+                    const views = {
+                        users: `
+                            <div class="panel-card"><h2><i class="fa-solid fa-users" style="color: var(--admin-primary);"></i> Gestión de usuarios</h2>
+                            <p style="color:#aaa;">Administra cuentas, estados y permisos de la comunidad.</p>
+                            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+                                <button class="btn-action admin-view-action" data-action="users-list"><i class="fa-solid fa-list"></i> Ver usuarios</button>
+                                <button class="btn-action admin-view-action" data-action="users-new"><i class="fa-solid fa-user-plus"></i> Crear usuario</button>
+                                <button class="btn-action admin-view-action" data-action="users-export"><i class="fa-solid fa-download"></i> Exportar lista</button>
+                            </div></div>`,
+                        communities: `
+                            <div class="panel-card"><h2><i class="fa-solid fa-users-rectangle" style="color: var(--admin-secondary);"></i> Gestión de comunidades</h2>
+                            <p style="color:#aaa;">Revisa la actividad y moderación de las comunidades creadas.</p>
+                            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+                                <button class="btn-action admin-view-action" data-action="communities-list"><i class="fa-solid fa-list"></i> Ver comunidades</button>
+                                <button class="btn-action admin-view-action" data-action="communities-featured"><i class="fa-solid fa-star"></i> Destacadas</button>
+                            </div></div>`,
+                        security: `
+                            <div class="panel-card"><h2><i class="fa-solid fa-shield-halved" style="color:#76ff03;"></i> Seguridad</h2>
+                            <p style="color:#aaa;">Estado de protección de la plataforma y controles de acceso.</p>
+                            <div style="display:grid; gap:12px; margin-top:20px;">
+                                <div class="badge badge-active">Protección activa</div>
+                                <div style="padding:14px; border:1px solid rgba(255,255,255,.1); border-radius:8px;">Última revisión: hoy · Autenticación y sesiones funcionando correctamente.</div>
+                                <button class="btn-action admin-view-action" data-action="security-review"><i class="fa-solid fa-magnifying-glass"></i> Ejecutar revisión</button>
+                            </div></div>`,
+                        reports: `
+                            <div class="panel-card"><h2><i class="fa-solid fa-triangle-exclamation" style="color:var(--admin-primary);"></i> Reportes pendientes</h2>
+                            <p style="color:#aaa;">Hay 3 reportes que requieren revisión del administrador.</p>
+                            <div style="display:grid; gap:12px; margin-top:20px;">
+                                <div style="padding:14px; border-left:3px solid var(--admin-primary); background:rgba(255,0,60,.08);">Reporte #103 · Contenido inapropiado <button class="btn-action admin-view-action" data-action="report-103" style="float:right;">Revisar</button></div>
+                                <div style="padding:14px; border-left:3px solid #ffeb3b; background:rgba(255,235,59,.08);">Reporte #102 · Spam repetitivo <button class="btn-action admin-view-action" data-action="report-102" style="float:right;">Revisar</button></div>
+                                <div style="padding:14px; border-left:3px solid #ffeb3b; background:rgba(255,235,59,.08);">Reporte #101 · Perfil sospechoso <button class="btn-action admin-view-action" data-action="report-101" style="float:right;">Revisar</button></div>
+                            </div></div>`,
+                        settings: `
+                            <div class="panel-card"><h2><i class="fa-solid fa-gear" style="color:#00f3ff;"></i> Ajustes del sistema</h2>
+                            <p style="color:#aaa;">Configura opciones generales del centro de administración.</p>
+                            <div style="display:grid; gap:16px; margin-top:20px;">
+                                <label style="display:flex; justify-content:space-between; align-items:center;">Modo mantenimiento <input type="checkbox" id="maintenanceToggle"></label>
+                                <label style="display:flex; justify-content:space-between; align-items:center;">Avisos automáticos <input type="checkbox" id="notificationsToggle" checked></label>
+                                <button class="btn-action admin-view-action" data-action="settings-save"><i class="fa-solid fa-floppy-disk"></i> Guardar ajustes</button>
+                            </div></div>`
+                    };
+                    sectionView.innerHTML = views[section] || '';
+                    sectionView.querySelectorAll('.admin-view-action').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const action = button.dataset.action;
+                            if (action === 'users-new') {
+                                const username = window.prompt('Nombre del nuevo usuario:');
+                                if (username && username.trim()) notify(`Usuario "${username.trim()}" preparado para registro.`);
+                                return;
+                            }
+                            if (action === 'settings-save') {
+                                localStorage.setItem('erg_admin_settings', JSON.stringify({
+                                    maintenance: document.getElementById('maintenanceToggle').checked,
+                                    notifications: document.getElementById('notificationsToggle').checked
+                                }));
+                            }
+                            notify(`Acción completada: ${button.textContent.trim()}.`);
+                        });
+                    });
+                    notify(`Vista de ${sectionNames[section]} cargada.`);
+                });
+            });
+
+            document.getElementById('refreshAdminData')?.addEventListener('click', event => {
+                const button = event.currentTarget;
+                button.classList.add('active');
+                const now = new Date().toLocaleTimeString();
+                notify(`Datos del panel actualizados correctamente a las ${now}.`);
+                setTimeout(() => button.classList.remove('active'), 500);
+            });
+
+            document.getElementById('globalAdminMessage')?.addEventListener('click', () => {
+                const message = window.prompt('Escribe el mensaje global para la comunidad:');
+                if (!message || !message.trim()) return;
+                localStorage.setItem('erg_admin_global_message', message.trim());
+                const notices = document.querySelector('.panel-card ul');
+                if (notices) {
+                    const item = document.createElement('li');
+                    item.style.cssText = 'padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);';
+                    item.innerHTML = '<div style="color: #00f3ff; font-weight: bold;">[MENSAJE GLOBAL]</div>' + message.trim();
+                    notices.prepend(item);
+                }
+                notify('Mensaje global publicado correctamente.');
+            });
+
+            document.querySelectorAll('.user-edit-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const row = button.closest('tr');
+                    const name = row?.querySelector('td:first-child div div div')?.textContent || 'usuario';
+                    const updatedName = window.prompt(`Nuevo nombre visible para ${name}:`, name);
+                    if (updatedName && updatedName.trim()) {
+                        const nameElement = row.querySelector('td:first-child div div div');
+                        nameElement.textContent = updatedName.trim();
+                        notify('Usuario actualizado correctamente.');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.user-ban-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const row = button.closest('tr');
+                    const status = row?.querySelector('.badge');
+                    if (!status) return;
+                    const banned = status.classList.contains('badge-banned');
+                    status.classList.toggle('badge-banned', !banned);
+                    status.classList.toggle('badge-active', banned);
+                    status.textContent = banned ? 'Activo' : 'Baneado';
+                    button.innerHTML = banned ? '<i class="fa-solid fa-ban"></i>' : '<i class="fa-solid fa-undo"></i>';
+                    notify(banned ? 'Usuario reactivado.' : 'Usuario baneado.');
+                });
+            });
+
+            document.querySelectorAll('.user-undo-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const row = button.closest('tr');
+                    const status = row?.querySelector('.badge');
+                    if (!status) return;
+                    status.className = 'badge badge-active';
+                    status.textContent = 'Activo';
+                    button.remove();
+                    notify('Usuario restaurado correctamente.');
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>
