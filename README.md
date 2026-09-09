@@ -13,7 +13,7 @@ El proyecto ha sido organizado para seguir una estructura clara y profesional:
 
 ```text
 El Rincon Del Gamer/
-├── server.js           # Servidor Backend Express (API de Estudiantes)
+├── server.js           # Servidor Backend Express
 ├── package.json        # Dependencias y scripts del backend
 ├── package-lock.json   # Lockfile de dependencias Node.js
 ├── src/                # Lógica de la aplicación y componentes
@@ -30,7 +30,7 @@ El Rincon Del Gamer/
 │   ├── login.html      # Pantalla de Inicio de Sesión
 │   └── panel_control/  # Paneles de Usuario y Administración
 ├── docs/               # Documentación técnica del proyecto
-├── index.html          # Dashboard Principal y Gestión de Estudiantes
+├── index.html          # Dashboard Principal
 └── README.md           # Este archivo
 ```
 
@@ -41,20 +41,15 @@ El Rincon Del Gamer/
 - **Node.js & Express 5**: Servidor backend y API REST.
 - **FontAwesome**: Iconografía.
 
-## 🔌 API Backend Express (Puerto 3000)
+## 🔌 Backend Express (Puerto 3000)
 Para iniciar el servidor backend:
 ```bash
 npm install
 npm start
 ```
 
-### Rutas Disponibles:
+### Ruta disponible:
 - `GET /`: Mensaje de bienvenida al backend.
-- `GET /estudiantes`: Listado de estudiantes registrados.
-- `POST /estudiantes`: Registro de nuevo estudiante (valida `nombre`, `edad`, `correo`).
-- `PUT /estudiantes/:id`: Actualización de datos del estudiante.
-- `DELETE /estudiantes/:id`: Eliminación de estudiante.
-- `GET /buscar?termino=...`: Búsqueda de estudiantes por nombre, juego o correo.
 
 ## 📖 Documentación Adicional
 Para más detalles sobre la arquitectura y el desarrollo, consulta la carpeta `docs/`:

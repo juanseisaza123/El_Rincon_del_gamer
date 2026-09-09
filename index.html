@@ -88,7 +88,6 @@
                 <li><a href="#" class="sidebar-item" data-target="principal">Crear publicación</a></li>
                 <li><a href="#" class="sidebar-item" data-target="noticias">Noticias</a></li>
                 <li><a href="#" class="sidebar-item" data-target="cursos">Cursos</a></li>
-                <li><a href="#" class="sidebar-item" data-target="estudiantes"><i class="fa-solid fa-users"></i> Estudiantes</a></li>
             </ul>
 
             <hr class="sidebar-divider">
@@ -511,91 +510,6 @@
                 </div>
             </div>
 
-            <!-- Sección Estudiantes (Backend Express) -->
-            <div id="estudiantes" class="feed-section">
-                <!-- Status Banner & Title -->
-                <div class="academia-header-card">
-                    <div class="academia-title-info">
-                        <h2 class="section-title" style="margin-bottom: 5px; border: none; padding-bottom: 0;">
-                            <i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Estudiantes
-                        </h2>
-                        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 0;">
-                            Módulo conectado a la API Express en <code style="color: var(--accent-primary);">http://localhost:3000</code>
-                        </p>
-                    </div>
-                    <div class="backend-status-badge status-offline" id="backendStatusBadge">
-                        <span class="status-pulse" id="statusPulse"></span>
-                        <span id="statusLabel">Conectando API...</span>
-                    </div>
-                </div>
-
-                <!-- Barra de Búsqueda y Filtros de Estudiantes -->
-                <div class="academia-toolbar">
-                    <div class="search-bar" style="flex: 1; max-width: none;">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="studentSearchInput" placeholder="Buscar por nombre, juego o correo (GET /buscar)...">
-                    </div>
-                    <button class="tool-btn" id="btnSearchStudent" style="background: var(--bg-tertiary); color: var(--accent-primary);"><i class="fa-solid fa-filter"></i> Filtrar</button>
-                    <button class="tool-btn" id="btnReloadStudents" title="Refrescar lista"><i class="fa-solid fa-arrows-rotate"></i></button>
-                </div>
-
-                <!-- Formulario para Registrar Estudiante (POST /estudiantes) -->
-                <div class="create-post-card" style="margin-bottom: 25px;">
-                    <h3 style="color: var(--text-primary); font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-user-plus" style="color: var(--accent-secondary);"></i> Registrar Nuevo Estudiante
-                    </h3>
-
-                    <form id="formAddStudent" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <div>
-                            <label style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; display: block;">Nombre *</label>
-                            <input type="text" id="studentNameInput" class="post-input" style="min-height: 40px; padding: 8px 12px; width: 100%;" placeholder="Ej: Ana" required>
-                        </div>
-                        <div>
-                            <label style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; display: block;">Edad *</label>
-                            <input type="number" id="studentAgeInput" class="post-input" style="min-height: 40px; padding: 8px 12px; width: 100%;" placeholder="Ej: 20" min="10" max="99" required>
-                        </div>
-                        <div>
-                            <label style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; display: block;">Correo *</label>
-                            <input type="email" id="studentEmailInput" class="post-input" style="min-height: 40px; padding: 8px 12px; width: 100%;" placeholder="Ej: ana@correo.com" required>
-                        </div>
-                        <div>
-                            <label style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; display: block;">Rango</label>
-                            <select id="studentRankInput" class="post-input" style="min-height: 40px; padding: 8px 12px; width: 100%; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 8px;">
-                                <option value="Iniciado">Iniciado</option>
-                                <option value="Bronce">Bronce</option>
-                                <option value="Plata">Plata</option>
-                                <option value="Oro">Oro</option>
-                                <option value="Platino">Platino</option>
-                                <option value="Diamante" selected>Diamante</option>
-                                <option value="Maestro">Maestro</option>
-                                <option value="Gran Maestro">Gran Maestro</option>
-                            </select>
-                        </div>
-                        <div style="grid-column: 1 / -1; display: flex; gap: 15px; align-items: flex-end;">
-                            <div style="flex: 1;">
-                                <label style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; display: block;">Juego Principal / Especialidad</label>
-                                <input type="text" id="studentGameInput" class="post-input" style="min-height: 40px; padding: 8px 12px; width: 100%;" placeholder="Ej: Valorant, Apex Legends, League of Legends...">
-                            </div>
-                            <button type="submit" class="btn-publish" style="padding: 11px 24px; white-space: nowrap;">
-                                <i class="fa-solid fa-user-plus"></i> Registrar Estudiante
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Grid de Estudiantes Registrados (GET /estudiantes) -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 class="section-title" style="margin: 0; border: none; padding: 0;">
-                        <i class="fa-solid fa-users"></i> Estudiantes Registrados
-                        <span id="studentCountBadge" style="font-size: 12px; background: var(--bg-tertiary); color: var(--accent-primary); padding: 3px 10px; border-radius: 12px; margin-left: 8px;">0</span>
-                    </h3>
-                </div>
-
-                <div id="studentsListGrid" class="students-grid">
-                    <!-- Dinámicamente cargados -->
-                </div>
-            </div>
-
         </section>
     </main>
 
@@ -627,54 +541,6 @@
                 </button>
             </div>
         </div>
-    <!-- Modal para Editar Estudiante (PUT /estudiantes/:id) -->
-    <div class="modal-overlay" id="editStudentModal">
-        <div class="modal-content" style="max-width: 480px; border: 1px solid rgba(255,255,255,0.1); background: #0f1419; padding: 25px; border-radius: 14px;">
-            <div class="modal-header" style="padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0; font-size: 18px; color: var(--accent-primary);"><i class="fa-solid fa-user-pen"></i> Actualizar Estudiante</h3>
-                <button class="btn-close" id="closeEditStudentModal" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 18px;"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form id="formEditStudent" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
-                <input type="hidden" id="editStudentId">
-                <div>
-                    <label style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; display: block;">Gamertag / Nombre *</label>
-                    <input type="text" id="editStudentName" class="post-input" style="width: 100%; min-height: 40px; padding: 8px 12px;" required>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div>
-                        <label style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; display: block;">Edad *</label>
-                        <input type="number" id="editStudentAge" class="post-input" style="width: 100%; min-height: 40px; padding: 8px 12px;" required>
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; display: block;">Rango</label>
-                        <select id="editStudentRank" class="post-input" style="width: 100%; min-height: 40px; padding: 8px 12px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 8px;">
-                            <option value="Iniciado">Iniciado</option>
-                            <option value="Bronce">Bronce</option>
-                            <option value="Plata">Plata</option>
-                            <option value="Oro">Oro</option>
-                            <option value="Platino">Platino</option>
-                            <option value="Diamante">Diamante</option>
-                            <option value="Maestro">Maestro</option>
-                            <option value="Gran Maestro">Gran Maestro</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; display: block;">Correo *</label>
-                    <input type="email" id="editStudentEmail" class="post-input" style="width: 100%; min-height: 40px; padding: 8px 12px;" required>
-                </div>
-                <div>
-                    <label style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; display: block;">Juego Principal</label>
-                    <input type="text" id="editStudentGame" class="post-input" style="width: 100%; min-height: 40px; padding: 8px 12px;">
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-                    <button type="button" class="tool-btn" id="cancelEditStudentBtn" style="padding: 10px 18px;">Cancelar</button>
-                    <button type="submit" class="btn-publish" style="padding: 10px 20px;">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Chat Modal -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-modal-content">
