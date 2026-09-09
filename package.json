@@ -1,0 +1,23 @@
+{
+  "name": "el-rincon-del-gamer-backend",
+  "version": "1.0.0",
+  "description": "Backend Express para El Rincón Del Gamer (ERG)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gaming",
+    "estudiantes",
+    "express",
+    "erg"
+  ],
+  "author": "El Rincón Del Gamer",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

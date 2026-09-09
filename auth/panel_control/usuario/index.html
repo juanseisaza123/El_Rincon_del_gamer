@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Cuenta - ERG</title>
+    <link rel="stylesheet" href="../../../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-primary: #00f3ff;
+            --accent-secondary: #ff00e5;
+            --user-bg: #05070a;
+            --user-card-bg: rgba(15, 20, 25, 0.9);
+            --glow-opacity: 1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--user-bg);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 114, 255, 0.05) 0%, transparent 40%);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Settings */
+        .settings-sidebar {
+            width: 280px;
+            background: rgba(10, 12, 15, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .user-preview {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-primary);
+            padding: 3px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .user-info h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .user-info p {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            color: #808080;
+        }
+
+        .settings-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .settings-nav li {
+            margin-bottom: 5px;
+        }
+
+        .settings-nav a {
+            color: #a0a0a0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .settings-nav a:hover,
+        .settings-nav a.active {
+            background: rgba(0, 243, 255, 0.08);
+            color: var(--accent-primary);
+        }
+
+        /* Main Area */
+        .settings-content {
+            margin-left: 280px;
+            flex-grow: 1;
+            padding: 50px;
+            max-width: 900px;
+        }
+
+        .settings-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            margin-bottom: 40px;
+        }
+
+        .section-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .section-header p {
+            color: #808080;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ccc;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: white;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .option-card {
+            background: var(--user-card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-card:hover {
+            border-color: var(--accent-primary);
+            background: rgba(0, 243, 255, 0.03);
+            transform: translateY(-2px);
+        }
+
+        .option-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--accent-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .option-info h4 {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .option-info p {
+            margin: 3px 0 0 0;
+            font-size: 12px;
+            color: #606060;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-save:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 243, 255, 0.3);
+        }
+
+        .back-dashboard {
+            position: fixed;
+            top: 20px;
+            right: 40px;
+            color: #606060;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+            z-index: 1000;
+        }
+
+        .back-dashboard:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Toggle Button */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin-left: auto;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--accent-primary);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../../../index.html" class="back-dashboard">
+        <i class="fa-solid fa-house"></i> Volver al Dashboard
+    </a>
+
+    <aside class="settings-sidebar">
+        <div class="user-preview">
+            <img src="" class="user-avatar" id="sidebarAvatar">
+            <div class="user-info">
+                <h3 id="sidebarName">Cargando...</h3>
+                <p id="sidebarHandle">@usuario</p>
+            </div>
+        </div>
+
+        <ul class="settings-nav">
+            <li><a class="nav-link active" data-target="perfil"><i class="fa-solid fa-user-pen"></i> Editar Perfil</a>
+            </li>
+            <li><a href="configuracion.html" class="nav-link"><i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Configuración</a></li>
+            <li><a class="nav-link" style="margin-top: 10px; color: #ff4d4d;"><i class="fa-solid fa-trash"></i> Eliminar
+                    Cuenta</a></li>
+        </ul>
+
+    </aside>
+
+    <main class="settings-content">
+        <!-- SECCIÓN PERFIL -->
+        <section id="perfil" class="settings-section active">
+            <div class="section-header">
+                <h1>Editar Perfil</h1>
+                <p>Personaliza tu identidad en El Rincón Del Gamer.</p>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>Nombre de Jugador</label>
+                    <input type="text" class="form-control" id="inputName">
+                </div>
+
+                <div class="form-group">
+                    <label>Biografía</label>
+                    <textarea class="form-control" rows="4" id="inputBio"></textarea>
+                </div>
+
+                <div
+                    style="display: flex; align-items: center; gap: 20px; margin-top: 40px; padding: 20px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 15px;">
+                    <img src="" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover;"
+                        id="avatarPreview">
+                    <div style="flex-grow: 1;">
+                        <h4 style="margin: 0;">Avatar del Jugador</h4>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #808080;">Tu imagen de perfil.</p>
+                    </div>
+                    <input type="file" id="fileAvatar" style="display: none;" accept="image/*">
+                    <button type="button" class="form-control" style="width: auto;" id="btnChangeAvatar">Cambiar
+                        Avatar</button>
+                </div>
+
+                <button type="button" class="btn-save" id="btnSave">Guardar Perfil</button>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const profile = JSON.parse(localStorage.getItem('erg_profile'));
+            if (profile) {
+                document.getElementById('sidebarName').textContent = profile.name;
+                document.getElementById('sidebarHandle').textContent = profile.handle;
+                document.getElementById('sidebarAvatar').src = profile.avatar;
+                document.getElementById('inputName').value = profile.name;
+                document.getElementById('inputBio').value = profile.bio;
+                document.getElementById('avatarPreview').src = profile.avatar;
+            }
+
+            // Cambiar Avatar
+            const btnChangeAvatar = document.getElementById('btnChangeAvatar');
+            const fileAvatar = document.getElementById('fileAvatar');
+            const avatarPreview = document.getElementById('avatarPreview');
+            let newAvatarData = null;
+
+            btnChangeAvatar.addEventListener('click', () => fileAvatar.click());
+            fileAvatar.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        newAvatarData = ev.target.result;
+                        avatarPreview.src = newAvatarData;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Guardar Perfil
+            const btnSave = document.getElementById('btnSave');
+            btnSave.addEventListener('click', () => {
+                const name = document.getElementById('inputName').value;
+                const bio = document.getElementById('inputBio').value;
+
+                if (profile) {
+                    profile.name = name;
+                    profile.bio = bio;
+                    if (newAvatarData) profile.avatar = newAvatarData;
+                    localStorage.setItem('erg_profile', JSON.stringify(profile));
+
+                    btnSave.textContent = 'Guardado!';
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            });
+
+            // Apply global vars for consistency
+            const settings = JSON.parse(localStorage.getItem('erg_settings')) || { theme: 'neon-blue', glowEffect: true };
+            const root = document.documentElement;
+            if (settings.theme === 'vampire-red') root.style.setProperty('--accent-primary', '#ff003c');
+            else if (settings.theme === 'cyberpunk-gold') root.style.setProperty('--accent-primary', '#ffb700');
+            else if (settings.theme === 'emerald-green') root.style.setProperty('--accent-primary', '#00ff88');
+            root.style.setProperty('--glow-opacity', settings.glowEffect ? '1' : '0');
+        });
+    </script>
+
+</body>
+
+</html>

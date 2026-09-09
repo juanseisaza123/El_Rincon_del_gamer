@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - ERG | El Rincón Del Gamer</title>
+    <link rel="stylesheet" href="assets/css/login.css">
+</head>
+
+<body>
+    <!-- Fondos dinámicos coloridos y gamer -->
+    <div class="cyber-grid"></div>
+    <div class="bg-shape shape-red"></div>
+    <div class="bg-shape shape-orange"></div>
+    <div class="bg-shape shape-cyan"></div>
+    <div class="bg-shape shape-purple"></div>
+
+    <!-- Logos flotantes masivos generados por JS -->
+    <div class="floating-elements" id="floatingElements"></div>
+
+    <div class="login-container">
+        <h1>Iniciar sesión</h1>
+        <p class="terms-text">
+            Al continuar, aceptas nuestro <a href="#" class="link">Acuerdo del usuario</a> y confirmas que has entendido
+            la <a href="#" class="link">Política de privacidad</a>.
+        </p>
+
+        <div class="auth-buttons">
+            <button type="button" class="btn-auth">
+                <span class="btn-text">Continuar con el Correo Electrónico</span>
+            </button>
+            <button type="button" class="btn-auth">
+                <span class="btn-text">Continuar con el Número de Teléfono</span>
+            </button>
+        </div>
+
+        <hr class="separator">
+
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Correo electrónico o nombre de usuario*" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Contraseña*" required>
+            </div>
+
+            <div class="form-footer">
+                <a href="#" class="forgot-password">¿Has olvidado tu contraseña?</a>
+
+                <p class="register-text">
+                    ¿Es tu primera vez en ERG? <a href="#" class="link">Regístrate</a>
+                </p>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <span>Iniciar sesión</span>
+            </button>
+        </form>
+    </div>
+
+    <script src="assets/js/login.js"></script>
+</body>
+
+</html>
