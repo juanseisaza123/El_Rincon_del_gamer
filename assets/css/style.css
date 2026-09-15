@@ -360,6 +360,27 @@ h3,
     position: relative;
 }
 
+.feed-section {
+    max-width: 1180px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.principal-layout {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.news-section .news-grid,
+.news-section .section-title,
+.news-section > p,
+#explorar > p {
+    width: 100%;
+    max-width: 1180px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /* Feed Section (Para tabs) */
 .feed-section {
     display: none !important;
@@ -1275,4 +1296,3 @@ h3,
 .modal-overlay.active {
     display: flex !important;
 }
-
