@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sampleUsers[username] && sampleUsers[username].password === password) {
                 console.log('Login exitoso (Usuario de muestra):', { username, role: sampleUsers[username].profile.role });
                 localStorage.setItem('erg_profile', JSON.stringify(sampleUsers[username].profile));
-                window.location.href = '../index.html';
+                window.location.replace('../index.html');
             } 
             // Validación genérica para otros usuarios (por defecto son 'user')
             else if (username.length > 3 && password.length >= 4) {
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random`
                 };
                 localStorage.setItem('erg_profile', JSON.stringify(genericProfile));
-                window.location.href = '../index.html';
+                window.location.replace('../index.html');
             } 
             else {
                 alert('Por favor introduzca un correo/usuario y una contraseña válidos para iniciar sesión.');
