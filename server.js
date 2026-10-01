@@ -13,6 +13,19 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get("/api/config", (req, res) => {
+    const url = process.env.PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !anonKey || anonKey === "your-anon-key" || anonKey === "your-publishable-or-anon-key") {
+        return res.status(503).json({
+            error: "Configura PUBLIC_SUPABASE_URL y PUBLIC_SUPABASE_ANON_KEY en el archivo .env."
+        });
+    }
+
+    res.json({ url, anonKey });
+});
+
 app.use(express.static(__dirname));
 
 const port = 3000;

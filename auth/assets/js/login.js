@@ -1,67 +1,86 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitButton = loginForm.querySelector('.btn-submit span');
+    const registerPrompt = document.getElementById('registerPrompt');
+    const loginPrompt = document.getElementById('loginPrompt');
+    const authMessage = document.getElementById('authMessage');
+    let isRegistering = false;
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+    const showMessage = (message, isError = false) => {
+        authMessage.textContent = message;
+        authMessage.style.color = isError ? '#ff6b6b' : '#00f3ff';
+    };
 
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
+    const setMode = (registering) => {
+        isRegistering = registering;
+        submitButton.textContent = registering ? 'Crear cuenta' : 'Iniciar sesión';
+        passwordInput.autocomplete = registering ? 'new-password' : 'current-password';
+        registerPrompt.hidden = registering;
+        loginPrompt.hidden = !registering;
+        showMessage('');
+    };
 
-            // Usuarios de muestra para testeo (con Roles añadidos)
-            const sampleUsers = {
-                'admin': {
-                    password: 'admin123',
-                    profile: {
-                        name: "Admin ERG",
-                        handle: "@erg_admin",
-                        role: "admin",
-                        bio: "Administrador del sistema. Control de calidad y soporte.",
-                        avatar: "https://ui-avatars.com/api/?name=Admin+ERG&background=ff003c&color=fff"
+    registerPrompt.querySelector('a').addEventListener('click', (event) => {
+        event.preventDefault();
+        setMode(true);
+    });
+
+    loginPrompt.querySelector('a').addEventListener('click', (event) => {
+        event.preventDefault();
+        setMode(false);
+    });
+
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submitButton.parentElement.disabled = true;
+        showMessage('Conectando con Supabase...');
+
+        try {
+            const supabase = await window.ergSupabaseReady;
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const result = isRegistering
+                ? await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { username: email.split('@')[0] },
+                        emailRedirectTo: `${window.location.origin}/auth/login.html`
                     }
-                },
-                'gamer': {
-                    password: 'gamer123',
-                    profile: {
-                        name: "Gamer Pro",
-                        handle: "@gamer_pro",
-                        role: "user",
-                        bio: "Jugador profesional de FPS. Streamer a tiempo parcial.",
-                        avatar: "https://ui-avatars.com/api/?name=Gamer+Pro&background=00f3ff&color=333"
-                    }
-                }
-            };
+                })
+                : await supabase.auth.signInWithPassword({ email, password });
 
-            // Validación de usuarios de muestra
-            if (sampleUsers[username] && sampleUsers[username].password === password) {
-                console.log('Login exitoso (Usuario de muestra):', { username, role: sampleUsers[username].profile.role });
-                localStorage.setItem('erg_profile', JSON.stringify(sampleUsers[username].profile));
-                window.location.href = '../index.html';
-            } 
-            // Validación genérica para otros usuarios (por defecto son 'user')
-            else if (username.length > 3 && password.length >= 4) {
-                console.log('Login exitoso:', { username });
-                const genericProfile = {
-                    name: username,
-                    handle: "@" + username.toLowerCase().replace(/[^a-z0-z]/g, '_'),
-                    role: "user",
-                    bio: "¡Nuevo en El Rincón Del Gamer!",
-                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random`
-                };
-                localStorage.setItem('erg_profile', JSON.stringify(genericProfile));
-                window.location.href = '../index.html';
-            } 
-            else {
-                alert('Por favor introduzca un correo/usuario y una contraseña válidos para iniciar sesión.');
+            if (result.error) throw result.error;
+
+            if (isRegistering && !result.data.session) {
+                setMode(false);
+                showMessage('Cuenta creada. Revisa tu correo para confirmar la dirección y luego inicia sesión.');
+                return;
             }
-        });
-    }
 
-    const authButtons = document.querySelectorAll('.btn-auth');
-    authButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            console.log('Auth button clicked:', button.textContent);
-        });
+            const user = result.data.user;
+            const username = user.user_metadata.username || user.email?.split('@')[0] || email.split('@')[0];
+            localStorage.setItem('erg_profile', JSON.stringify({
+                name: username,
+                handle: `@${username.toLowerCase().replace(/[^a-z0-9_]/g, '_')}`,
+                role: 'user',
+                bio: '¡Nuevo en El Rincón Del Gamer!',
+                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random`
+            }));
+            window.location.replace('../index.html');
+        } catch (error) {
+            console.error('Error de autenticación con Supabase:', error);
+            showMessage(error.message || 'No se pudo completar la autenticación.', true);
+        } finally {
+            submitButton.parentElement.disabled = false;
+        }
+    });
+
+    window.ergSupabaseReady.catch((error) => {
+        console.error('No se pudo inicializar Supabase:', error);
+        showMessage(error.message, true);
     });
 
     createFloatingIcons();

@@ -7,12 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const newsModalImage = document.getElementById('newsModalImage');
     const newsModalContent = document.getElementById('newsModalContent');
 
-    document.querySelectorAll('.btn-read-more').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+    const openNewsArticle = (btn) => {
             const data = btn.dataset;
-            
             if(newsModalTitle) newsModalTitle.textContent = data.title;
             if(newsModalBadge) {
                 newsModalBadge.textContent = data.badge;
@@ -25,14 +21,84 @@ document.addEventListener('DOMContentLoaded', () => {
             if(newsModalContent) newsModalContent.innerHTML = data.fullContent;
             
             if(newsModal) newsModal.classList.add('active');
+
+            const selectedCard = btn.closest('.news-card');
+            if (selectedCard) {
+                document.getElementById('newsArticleDetails')?.remove();
+                const articleDetails = document.createElement('article');
+                articleDetails.id = 'newsArticleDetails';
+                articleDetails.className = 'news-article-details';
+                articleDetails.innerHTML = `
+                    <div class="news-article-details-image" style="background-image: url('${data.image}')"></div>
+                    <div class="news-article-details-body">
+                        <span class="news-badge">${data.badge}</span>
+                        <h2>${data.title}</h2>
+                        <div class="news-article-details-content">${data.fullContent}</div>
+                        <button type="button" class="tool-btn news-details-close"><i class="fa-solid fa-xmark"></i> Cerrar noticia</button>
+                    </div>`;
+                selectedCard.insertAdjacentElement('afterend', articleDetails);
+                articleDetails.querySelector('.news-details-close').addEventListener('click', () => articleDetails.remove());
+                articleDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+    };
+
+    document.querySelectorAll('.btn-read-more').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openNewsArticle(btn);
         });
     });
+
+    const newsGridForClicks = document.getElementById('newsGrid');
+    if (newsGridForClicks) {
+        newsGridForClicks.addEventListener('click', (e) => {
+            const button = e.target.closest('.btn-read-more');
+            if (!button) return;
+            e.preventDefault();
+            e.stopPropagation();
+            openNewsArticle(button);
+        });
+    }
 
     if(closeNewsModal) {
         closeNewsModal.addEventListener('click', () => {
             if(newsModal) newsModal.classList.remove('active');
         });
     }
+
+    const newsGrid = document.getElementById('newsGrid');
+    const newsSearchInput = document.getElementById('newsSearchInput');
+    const newsEmptyState = document.getElementById('newsEmptyState');
+    const newsFilters = document.querySelectorAll('.news-filter');
+    let selectedNewsFilter = 'all';
+
+    const filterNews = () => {
+        if (!newsGrid) return;
+        const query = newsSearchInput ? newsSearchInput.value.trim().toLowerCase() : '';
+        let visibleNews = 0;
+
+        newsGrid.querySelectorAll('.news-card').forEach((card) => {
+            const badge = card.querySelector('.news-badge')?.textContent.trim() || '';
+            const searchableText = card.textContent.toLowerCase();
+            const matchesFilter = selectedNewsFilter === 'all' || badge === selectedNewsFilter;
+            const matchesSearch = !query || searchableText.includes(query);
+            const isVisible = matchesFilter && matchesSearch;
+            card.hidden = !isVisible;
+            if (isVisible) visibleNews += 1;
+        });
+
+        if (newsEmptyState) newsEmptyState.hidden = visibleNews > 0;
+    };
+
+    newsFilters.forEach((filterButton) => {
+        filterButton.addEventListener('click', () => {
+            selectedNewsFilter = filterButton.dataset.newsFilter;
+            newsFilters.forEach((button) => button.classList.toggle('active', button === filterButton));
+            filterNews();
+        });
+    });
+    if (newsSearchInput) newsSearchInput.addEventListener('input', filterNews);
 
     // Unified outside click handler for all modal overlays
     document.querySelectorAll('.modal-overlay').forEach(modal => {
@@ -74,12 +140,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const editHandle = document.getElementById('editHandle');
         const editBio = document.getElementById('editBio');
         const comPostAvatar = document.getElementById('comPostAreaAvatar');
+        const profileCover = document.getElementById('profileCover');
         
         if(headerAvatar) headerAvatar.src = profile.avatar;
         if(postAvatar) postAvatar.src = profile.avatar;
         if(profileAvatar) profileAvatar.src = profile.avatar;
         if(editAvatarPreview) editAvatarPreview.src = profile.avatar;
         if(comPostAvatar) comPostAvatar.src = profile.avatar;
+        if(profileCover && profile.cover) profileCover.style.backgroundImage = `linear-gradient(90deg, rgba(8, 13, 25, 0.25), rgba(8, 13, 25, 0.05)), url("${profile.cover}")`;
         
         if(profileName) profileName.innerHTML = `${escapeHTML(profile.name)} <i class="fa-solid fa-circle-check" style="color: var(--accent-primary); font-size: 16px;"></i>`;
         if(profileHandle) profileHandle.textContent = profile.handle.startsWith('@') ? escapeHTML(profile.handle) : `@${escapeHTML(profile.handle)}`;
@@ -108,11 +176,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const settings = JSON.parse(localStorage.getItem('erg_settings')) || { theme: 'neon-blue', gamerCursor: false, glowEffect: true };
         const root = document.documentElement;
         
-        // Theme
-        if(settings.theme === 'vampire-red') root.style.setProperty('--accent-primary', '#ff003c');
-        else if(settings.theme === 'cyberpunk-gold') root.style.setProperty('--accent-primary', '#ffb700');
-        else if(settings.theme === 'emerald-green') root.style.setProperty('--accent-primary', '#00ff88');
-        else root.style.setProperty('--accent-primary', '#00f3ff');
+        const themes = {
+            'neon-blue': { primary: '#00f3ff', secondary: '#246bff', bg: '#101622', card: '#182234', tertiary: '#202d42', text: '#f2f7ff', muted: '#93a4bd', border: '#30435e' },
+            'vampire-red': { primary: '#ff365f', secondary: '#b026ff', bg: '#1c1018', card: '#291522', tertiary: '#3b1b2e', text: '#fff3f6', muted: '#c59eaa', border: '#5a2a43' },
+            'cyberpunk-gold': { primary: '#ffcf33', secondary: '#ff6b35', bg: '#181714', card: '#27231a', tertiary: '#383020', text: '#fff9df', muted: '#c1b58c', border: '#5c4b27' },
+            'emerald-green': { primary: '#00f59b', secondary: '#00b8d9', bg: '#0d1b1a', card: '#142824', tertiary: '#1d3933', text: '#e9fff8', muted: '#8eb5a9', border: '#2d5c50' },
+            'space-purple': { primary: '#b977ff', secondary: '#ff4fd8', bg: '#151225', card: '#211a38', tertiary: '#30244e', text: '#f8f1ff', muted: '#b9a9d0', border: '#4d3974' },
+            'inferno-orange': { primary: '#ff7a18', secondary: '#ff1744', bg: '#21120d', card: '#321b12', tertiary: '#4b2618', text: '#fff5ed', muted: '#d6a58a', border: '#713c25' },
+            'ice-white': { primary: '#62d9ff', secondary: '#f5fbff', bg: '#101a24', card: '#1b2b3a', tertiary: '#294358', text: '#f5fbff', muted: '#a9c4d4', border: '#42677e' },
+            'toxic-lime': { primary: '#d7ff3f', secondary: '#00c853', bg: '#111a12', card: '#1c2a1b', tertiary: '#2a4028', text: '#f5ffe2', muted: '#a8be91', border: '#527342' }
+        };
+        const theme = themes[settings.theme] || themes['neon-blue'];
+        const themeVariables = {
+            '--accent-primary': theme.primary,
+            '--accent-secondary': theme.secondary,
+            '--bg-main': theme.bg,
+            '--bg-secondary': theme.card,
+            '--bg-tertiary': theme.tertiary,
+            '--text-primary': theme.text,
+            '--text-secondary': theme.muted,
+            '--border-subtle': theme.border
+        };
+        Object.entries(themeVariables).forEach(([name, value]) => root.style.setProperty(name, value));
 
         // Cursor
         if(settings.gamerCursor) {
@@ -151,9 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load local storage posts
     const loadPosts = () => {
         const savedPosts = JSON.parse(localStorage.getItem('erg_posts')) || [];
-        const createPostWrapper = document.querySelector('.create-post-card');
-        const injectTarget = createPostWrapper ? (createPostWrapper.closest('.feed-card') || createPostWrapper) : null;
+        const injectTarget = document.getElementById('homePosts');
         if(injectTarget && savedPosts.length > 0) {
+            const emptyState = document.getElementById('homeEmptyState');
+            if (emptyState) emptyState.style.display = 'none';
             [...savedPosts].reverse().forEach((html, idx) => {
                 // Ensure ID exists before injection
                 if (!html.includes('data-post-id=')) {
@@ -272,30 +358,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Dark/Light Theme Toggle
+    // Appearance picker: mode and color palette are persisted independently.
     const moonBtn = document.querySelector('.moon-btn');
-    
-    // Load persisted theme
-    if (localStorage.getItem('erg_theme') === 'light') {
-        document.body.classList.add('light-mode');
-        if (moonBtn) {
-            moonBtn.querySelector('i').className = 'fa-solid fa-sun';
-        }
-    }
+    const themePicker = document.getElementById('themePicker');
+    const themeModeOptions = document.querySelectorAll('.theme-mode-option');
+    const themeColorOptions = document.querySelectorAll('.theme-color-option');
+    const getSystemThemeMode = () => window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 
-    if (moonBtn) {
-        moonBtn.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
+    const applyThemeMode = (mode) => {
+        const activeMode = mode === 'system' ? getSystemThemeMode() : mode;
+        document.body.classList.toggle('light-mode', activeMode === 'light');
+        if (moonBtn) {
             const icon = moonBtn.querySelector('i');
-            if (document.body.classList.contains('light-mode')) {
-                icon.className = 'fa-solid fa-sun';
-                localStorage.setItem('erg_theme', 'light');
-            } else {
-                icon.className = 'fa-solid fa-moon';
-                localStorage.setItem('erg_theme', 'dark');
-            }
+            if (icon) icon.className = activeMode === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+        themeModeOptions.forEach(option => option.classList.toggle('active', option.dataset.mode === mode));
+    };
+
+    const savedThemeMode = localStorage.getItem('erg_theme') || 'system';
+    applyThemeMode(savedThemeMode);
+
+    if (moonBtn && themePicker) {
+        moonBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const willOpen = !themePicker.classList.contains('show');
+            themePicker.classList.toggle('show', willOpen);
+            moonBtn.setAttribute('aria-expanded', String(willOpen));
+        });
+        themePicker.addEventListener('click', event => event.stopPropagation());
+        document.addEventListener('click', () => {
+            themePicker.classList.remove('show');
+            moonBtn.setAttribute('aria-expanded', 'false');
         });
     }
+
+    themeModeOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            localStorage.setItem('erg_theme', option.dataset.mode);
+            applyThemeMode(option.dataset.mode);
+        });
+    });
+
+    themeColorOptions.forEach(option => {
+        option.classList.toggle('active', option.dataset.theme === (JSON.parse(localStorage.getItem('erg_settings') || '{}').theme || 'neon-blue'));
+        option.addEventListener('click', () => {
+            const settings = JSON.parse(localStorage.getItem('erg_settings')) || { theme: 'neon-blue', gamerCursor: false, glowEffect: true };
+            settings.theme = option.dataset.theme;
+            localStorage.setItem('erg_settings', JSON.stringify(settings));
+            applyGlobalSettings();
+            themeColorOptions.forEach(item => item.classList.toggle('active', item === option));
+        });
+    });
+
+    const systemThemeMedia = window.matchMedia('(prefers-color-scheme: light)');
+    systemThemeMedia.addEventListener?.('change', () => {
+        if (localStorage.getItem('erg_theme') === 'system') applyThemeMode('system');
+    });
 
     // Dropdowns (Bell & Avatar)
     const bellBtn = document.getElementById('bellBtn');
@@ -366,17 +484,200 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnSalir = document.getElementById('btnSalir');
     if (btnSalir) {
-        btnSalir.addEventListener('click', () => {
+        btnSalir.addEventListener('click', async () => {
              document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
              showToast('Cerrando sesión...', 'linear-gradient(135deg, var(--accent-secondary), #b026ff)');
-             setTimeout(() => {
+             try {
+                 const supabase = await window.ergSupabaseReady;
+                 const { error } = await supabase.auth.signOut();
+                 if (error) throw error;
                  localStorage.clear();
                  window.location.href = 'auth/login.html';
-             }, 1500);
+             } catch (error) {
+                 console.error('No se pudo cerrar la sesión de Supabase:', error);
+                 showToast('No se pudo cerrar la sesión. Inténtalo de nuevo.', '#ff4747');
+             }
         });
     }
 
     // Create Post Interactions & Toast
+    const openPublicationEditor = document.getElementById('openPublicationEditor');
+    if (openPublicationEditor) {
+        openPublicationEditor.addEventListener('click', () => {
+            const editorLink = document.querySelector('.sidebar-item[data-target="crear-publicacion"]');
+            if (editorLink) editorLink.click();
+        });
+    }
+
+    const openHomeSection = (target) => {
+        const targetLink = document.querySelector(`.sidebar-item[data-target="${target}"]`);
+        if (targetLink) targetLink.click();
+    };
+    const openExploreFromHome = document.getElementById('openExploreFromHome');
+    const openNewsFromHome = document.getElementById('openNewsFromHome');
+    if (openExploreFromHome) openExploreFromHome.addEventListener('click', () => openHomeSection('explorar'));
+    if (openNewsFromHome) openNewsFromHome.addEventListener('click', () => openHomeSection('noticias'));
+
+    const dedicatedPublishBtn = document.getElementById('dedicatedPublishBtn');
+    const dedicatedPostText = document.getElementById('dedicatedPostText');
+    const publicationPreview = document.getElementById('publicationPreview');
+    const previewToggle = document.getElementById('publicationPreviewToggle');
+    let previewReady = false;
+
+    if (dedicatedPublishBtn && dedicatedPostText && publicationPreview) {
+        dedicatedPublishBtn.addEventListener('click', () => {
+            const title = document.getElementById('publicationTitle').value.trim();
+            const category = document.getElementById('publicationCategory').value;
+            const text = dedicatedPostText.value.trim();
+            const tags = document.getElementById('publicationTags').value.trim();
+
+            if (!title || !text) {
+                showToast('Añade un título y escribe el contenido de tu publicación.', '#ff4d4d');
+                return;
+            }
+
+            const safeTitle = escapeHTML(title);
+            const safeCategory = escapeHTML(category);
+            const safeText = escapeHTML(text).replace(/\n/g, '<br>');
+            const safeTags = escapeHTML(tags);
+            const postHTML = `
+                <article class="post-card dedicated-post" data-category="${safeCategory}" style="animation: toastSlideIn 0.4s ease forwards; background: var(--bg-secondary); border: 1px solid var(--accent-primary);">
+                    <div class="post-header">
+                        <img src="${currentProfile.avatar}" alt="User" class="post-avatar" style="object-fit: cover;">
+                        <div class="post-info"><h3>${escapeHTML(currentProfile.name)}</h3><span>Justo ahora • ${safeCategory}</span></div>
+                    </div>
+                    <div class="post-content"><h2>${safeTitle}</h2><p>${safeText}</p>${safeTags ? `<small style="color: var(--accent-primary);">${safeTags}</small>` : ''}</div>
+                    <div class="post-footer"><button class="action-btn like-btn"><i class="fa-regular fa-heart"></i> <span>0</span></button><button class="action-btn comment-btn"><i class="fa-regular fa-comment"></i> <span>0</span></button></div>
+                </article>`;
+
+            if (previewToggle.checked && !previewReady) {
+                publicationPreview.innerHTML = `<div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">Vista previa</div>${postHTML}`;
+                publicationPreview.style.display = 'block';
+                previewReady = true;
+                dedicatedPublishBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar publicación';
+                return;
+            }
+
+            const homePosts = document.getElementById('homePosts');
+            const homeEmptyState = document.getElementById('homeEmptyState');
+            if (homePosts) homePosts.insertAdjacentHTML('afterbegin', postHTML);
+            if (homeEmptyState) homeEmptyState.style.display = 'none';
+            const savedPosts = JSON.parse(localStorage.getItem('erg_posts')) || [];
+            savedPosts.unshift(postHTML);
+            localStorage.setItem('erg_posts', JSON.stringify(savedPosts));
+            document.getElementById('publicationTitle').value = '';
+            dedicatedPostText.value = '';
+            document.getElementById('publicationTags').value = '';
+            publicationPreview.innerHTML = '';
+            publicationPreview.style.display = 'none';
+            previewReady = false;
+            dedicatedPublishBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publicar';
+            showToast('¡Publicación creada con éxito!', 'linear-gradient(135deg, var(--accent-primary), #0051ff)');
+        });
+    }
+
+    const clearPublicationEditor = document.getElementById('clearPublicationEditor');
+    if (clearPublicationEditor) {
+        clearPublicationEditor.addEventListener('click', () => {
+            document.getElementById('publicationTitle').value = '';
+            document.getElementById('dedicatedPostText').value = '';
+            document.getElementById('publicationTags').value = '';
+            document.getElementById('publicationPreview').innerHTML = '';
+            document.getElementById('publicationPreview').style.display = 'none';
+            previewReady = false;
+            document.getElementById('dedicatedPublishBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publicar';
+        });
+    }
+
+    // Clips verticales: feed local preparado para conectar después con una API.
+    const clipsFeed = document.getElementById('clipsFeed');
+    const clipUploader = document.getElementById('clipUploader');
+    const clipsProfilePanel = document.getElementById('clipsProfilePanel');
+    const clipVideoInput = document.getElementById('clipVideoInput');
+    const clipFileStatus = document.getElementById('clipFileStatus');
+    const defaultClips = [
+        { id: 'demo-1', title: 'Clutch imposible en ranked', game: 'Valorant', description: 'Cuando todo parecía perdido, apareció el último pixel de vida.', creator: 'LunaFPS', handle: '@lunafps', avatar: 'https://ui-avatars.com/api/?name=Luna+FPS&background=ff365f&color=fff', video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', likes: 1280, comments: 43, following: false },
+        { id: 'demo-2', title: 'La ruta secreta del mapa', game: 'Fortnite', description: 'Este drop cambia por completo el inicio de la partida.', creator: 'KiroPlay', handle: '@kiroplay', avatar: 'https://ui-avatars.com/api/?name=Kiro+Play&background=00f3ff&color=07111c', video: 'https://www.w3schools.com/html/mov_bbb.mp4', likes: 864, comments: 27, following: false }
+    ];
+
+    const getClips = () => {
+        const saved = JSON.parse(localStorage.getItem('erg_clips') || 'null');
+        if (Array.isArray(saved) && saved.length) return saved;
+        return defaultClips.map(clip => ({ ...clip }));
+    };
+    const saveClips = clips => {
+        try { localStorage.setItem('erg_clips', JSON.stringify(clips)); return true; }
+        catch (error) { showToast('El video ocupa demasiado espacio local. Prueba con un clip más corto.', '#ff4d4d'); return false; }
+    };
+    const clipNumber = value => value >= 1000 ? `${(value / 1000).toFixed(1)}K` : String(value || 0);
+    const renderClips = () => {
+        if (!clipsFeed) return;
+        const clips = getClips();
+        clipsFeed.innerHTML = clips.map(clip => `
+            <article class="clip-card" data-clip-id="${escapeHTML(clip.id)}">
+                <div class="clip-video-wrap"><span class="clip-live-badge"><i class="fa-solid fa-gamepad"></i> CLIP</span><video class="clip-video" src="${escapeHTML(clip.video)}" muted loop playsinline controls preload="metadata"></video></div>
+                <div class="clip-details">
+                    <div class="clip-creator"><img src="${escapeHTML(clip.avatar)}" alt="Avatar de ${escapeHTML(clip.creator)}"><strong>${escapeHTML(clip.creator)}</strong><button type="button" class="clip-follow-btn ${clip.following ? 'following' : ''}" data-action="follow">${clip.following ? 'Siguiendo' : 'Seguir'}</button></div>
+                    <span class="clip-game-tag"><i class="fa-solid fa-crosshairs"></i> ${escapeHTML(clip.game)}</span>
+                    <h3>${escapeHTML(clip.title)}</h3><p>${escapeHTML(clip.description || 'Un momento destacado de la comunidad ERG.')}</p><span class="clip-hashtag">#ERGClips #${escapeHTML(clip.game.replace(/\s+/g, ''))}</span>
+                    <div class="clip-actions"><button type="button" class="clip-action ${clip.liked ? 'active' : ''}" data-action="like"><i class="fa-${clip.liked ? 'solid' : 'regular'} fa-heart"></i><span>${clipNumber(clip.likes)}</span></button><button type="button" class="clip-action" data-action="comment"><i class="fa-regular fa-comment"></i><span>${clipNumber(clip.comments)}</span></button><button type="button" class="clip-action" data-action="share"><i class="fa-solid fa-share-nodes"></i><span>Compartir</span></button></div>
+                    <div class="clip-comments" data-comments><input type="text" maxlength="140" placeholder="Escribe un comentario..."><button type="button" data-action="send-comment"><i class="fa-solid fa-paper-plane"></i></button></div>
+                </div>
+            </article>`).join('');
+        clipsFeed.querySelectorAll('.clip-video').forEach(video => {
+            video.addEventListener('play', () => clipsFeed.querySelectorAll('.clip-video').forEach(other => { if (other !== video) other.pause(); }));
+        });
+    };
+    const renderClipProfile = () => {
+        if (!clipsProfileGrid) return;
+        const ownClips = getClips().filter(clip => clip.creator === currentProfile.name || clip.own);
+        const totalLikes = ownClips.reduce((sum, clip) => sum + (clip.likes || 0), 0);
+        document.getElementById('clipsProfileAvatar').src = currentProfile.avatar;
+        document.getElementById('clipsProfileName').textContent = currentProfile.name;
+        document.getElementById('clipsProfileHandle').textContent = currentProfile.handle;
+        document.getElementById('clipsProfileCount').textContent = ownClips.length;
+        document.getElementById('clipsProfileLikes').textContent = clipNumber(totalLikes);
+        clipsProfileGrid.innerHTML = ownClips.length ? ownClips.map(clip => `<div class="clip-profile-tile"><video src="${escapeHTML(clip.video)}" muted playsinline preload="metadata"></video><span>${escapeHTML(clip.title)}</span></div>`).join('') : '<p class="home-empty-state" style="grid-column: 1 / -1;">Todavía no has subido clips.</p>';
+    };
+    if (clipsFeed) {
+        renderClips();
+        clipsFeed.addEventListener('click', event => {
+            const actionButton = event.target.closest('[data-action]');
+            if (!actionButton) return;
+            const card = actionButton.closest('.clip-card');
+            const clips = getClips();
+            const clip = clips.find(item => item.id === card.dataset.clipId);
+            if (!clip) return;
+            const action = actionButton.dataset.action;
+            if (action === 'like') { clip.liked = !clip.liked; clip.likes = Math.max(0, (clip.likes || 0) + (clip.liked ? 1 : -1)); saveClips(clips); renderClips(); }
+            if (action === 'follow') { clip.following = !clip.following; saveClips(clips); renderClips(); showToast(clip.following ? `Sigues a ${clip.creator}.` : `Has dejado de seguir a ${clip.creator}.`, 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'); }
+            if (action === 'comment') card.querySelector('[data-comments]').classList.toggle('open');
+            if (action === 'send-comment') { const input = card.querySelector('[data-comments] input'); if (!input.value.trim()) return; clip.comments = (clip.comments || 0) + 1; saveClips(clips); renderClips(); showToast('Comentario añadido al clip.', 'var(--accent-primary)'); }
+            if (action === 'share') { const shareText = `${clip.title} en ERG Clips`; navigator.clipboard?.writeText(shareText); showToast('Enlace del clip copiado.', 'linear-gradient(135deg, var(--accent-primary), #0051ff)'); }
+        });
+    }
+    const showClipUploader = () => { if (clipUploader) { clipUploader.hidden = false; clipUploader.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } };
+    document.getElementById('openClipUploader')?.addEventListener('click', showClipUploader);
+    document.getElementById('closeClipUploader')?.addEventListener('click', () => { if (clipUploader) clipUploader.hidden = true; });
+    document.getElementById('cancelClipUpload')?.addEventListener('click', () => { if (clipUploader) clipUploader.hidden = true; });
+    clipVideoInput?.addEventListener('change', () => { const file = clipVideoInput.files[0]; if (file) clipFileStatus.innerHTML = `<i class="fa-solid fa-film"></i> ${escapeHTML(file.name)} · ${(file.size / 1024 / 1024).toFixed(1)} MB`; });
+    clipUploader?.addEventListener('submit', event => {
+        event.preventDefault();
+        const file = clipVideoInput?.files[0];
+        if (!file || file.size > 4 * 1024 * 1024) { showToast('Selecciona un video de máximo 4 MB.', '#ff4d4d'); return; }
+        const reader = new FileReader();
+        reader.onload = () => {
+            const clips = getClips();
+            clips.unshift({ id: `clip-${Date.now()}`, title: document.getElementById('clipTitleInput').value.trim(), game: document.getElementById('clipGameInput').value.trim(), description: document.getElementById('clipDescriptionInput').value.trim(), creator: currentProfile.name, handle: currentProfile.handle, avatar: currentProfile.avatar, video: reader.result, likes: 0, comments: 0, following: false, own: true });
+            if (!saveClips(clips)) return;
+            clipUploader.reset(); clipUploader.hidden = true; renderClips(); showToast('¡Clip publicado en ERG!', 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))');
+        };
+        reader.readAsDataURL(file);
+    });
+    const clipsProfileGrid = document.getElementById('clipsProfileGrid');
+    document.getElementById('openClipProfile')?.addEventListener('click', () => { clipsProfilePanel.hidden = false; clipsFeed.hidden = true; renderClipProfile(); });
+    document.getElementById('closeClipProfile')?.addEventListener('click', () => { clipsProfilePanel.hidden = true; clipsFeed.hidden = false; });
+
     const publishBtn = document.querySelector('.btn-publish');
     const postInput = document.querySelector('#postTextArea') || document.querySelector('.post-input');
     const toastContainer = document.getElementById('toast-container');
@@ -596,69 +897,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Search Bar Logic
+    // Search Bar Logic: section shortcuts plus content search.
     const searchInput = document.querySelector('#searchInput');
     const searchBtn = document.querySelector('#searchBtn');
-    
+    const searchResults = document.getElementById('searchResults');
+    const searchDestinations = [
+        { target: 'principal', label: 'Principal', hint: 'Tu centro de actividad', icon: 'fa-gamepad', color: '#00f3ff', terms: ['principal', 'inicio', 'home'] },
+        { target: 'explorar', label: 'Explorar', hint: 'Descubre contenido y comunidades', icon: 'fa-compass', color: '#ffcf33', terms: ['explorar', 'explore', 'descubrir'] },
+        { target: 'comunidad', label: 'Crear comunidad', hint: 'Funda un nuevo espacio gamer', icon: 'fa-users-rays', color: '#00f59b', terms: ['comunidad', 'comunidades', 'crear comunidad', 'grupo'] },
+        { target: 'crear-publicacion', label: 'Crear publicación', hint: 'Comparte una idea o jugada', icon: 'fa-pen-nib', color: '#ff7a18', terms: ['publicacion', 'publicación', 'post', 'crear'] },
+        { target: 'clips', label: 'Clips', hint: 'Mira jugadas en formato reels', icon: 'fa-clapperboard', color: '#ff4fd8', terms: ['clips', 'clip', 'reels', 'videos', 'video'] },
+        { target: 'noticias', label: 'Noticias', hint: 'Lo último del mundo gamer', icon: 'fa-newspaper', color: '#62d9ff', terms: ['noticias', 'news', 'actualidad'] },
+        { target: 'cursos', label: 'Cursos', hint: 'Aprende y sube de nivel', icon: 'fa-graduation-cap', color: '#b977ff', terms: ['cursos', 'curso', 'tutorial', 'aprender'] }
+    ];
+
+    const closeSearchResults = () => searchResults?.classList.remove('show');
+    const goToSearchTarget = (targetId, match = null) => {
+        const activeLink = document.querySelector(`.sidebar-item[data-target="${targetId}"]`);
+        if (activeLink) activeLink.click();
+        const targetSection = document.getElementById(targetId);
+        if (match) {
+            setTimeout(() => match.scrollIntoView({ behavior: 'smooth', block: 'center' }), 30);
+            match.classList.add('search-highlight');
+            setTimeout(() => match.classList.remove('search-highlight'), 2200);
+        } else if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        closeSearchResults();
+        if (searchInput) searchInput.value = '';
+    };
+    const getSearchSuggestions = query => {
+        const sectionMatches = searchDestinations.filter(item => item.label.toLowerCase().includes(query) || item.terms.some(term => term.includes(query)));
+        const contentMatches = Array.from(document.querySelectorAll('.news-card, .post-card, .clip-card')).filter(card => card.textContent.toLowerCase().includes(query)).slice(0, 3).map(card => ({ card, label: card.querySelector('h2, h3')?.textContent.trim() || 'Publicación encontrada', hint: card.closest('.feed-section')?.querySelector('.section-title')?.textContent.trim() || 'Contenido de ERG', icon: 'fa-arrow-up-right-from-square', color: 'var(--accent-primary)' }));
+        return [...sectionMatches.slice(0, 5), ...contentMatches];
+    };
+    const renderSearchSuggestions = () => {
+        if (!searchInput || !searchResults) return;
+        const query = searchInput.value.trim().toLowerCase();
+        if (!query) { closeSearchResults(); return; }
+        const suggestions = getSearchSuggestions(query);
+        if (!suggestions.length) { searchResults.innerHTML = '<div class="search-result-item"><i class="fa-solid fa-satellite-dish"></i><span>Sin coincidencias<small>Prueba con clips, noticias o explorar</small></span></div>'; searchResults.classList.add('show'); return; }
+        searchResults.innerHTML = suggestions.map((item, index) => `<button type="button" class="search-result-item" data-search-index="${index}" style="--search-result-color: ${item.color};"><i class="fa-solid ${item.icon}"></i><span>${escapeHTML(item.label)}<small>${escapeHTML(item.hint)}</small></span></button>`).join('');
+        searchResults.classList.add('show');
+        searchResults.querySelectorAll('.search-result-item').forEach((button, index) => button.addEventListener('click', () => {
+            const selected = suggestions[index];
+            goToSearchTarget(selected.target || selected.card.closest('.feed-section')?.id || 'principal', selected.card || null);
+        }));
+    };
     const handleSearch = () => {
         if (!searchInput) return;
         const query = searchInput.value.trim().toLowerCase();
-        
-        if (query !== "") {
-            // Buscar en Noticias, Cursos Y Posts de usuario
-            const allCards = Array.from(document.querySelectorAll('#noticias .news-card, #cursos .news-card, .post-card'));
-            
-            // Buscar la primera carta que coincida
-            const match = allCards.find(card => {
-                const title = card.querySelector('h3')?.textContent.toLowerCase() || "";
-                const text = card.querySelector('.post-content, p')?.textContent.toLowerCase() || "";
-                return title.includes(query) || text.includes(query);
-            });
-            
-            if (match) {
-                searchInput.value = '';
-                
-                // Encontrar la pestaña padre
-                const parentSection = match.closest('.feed-section') || document.getElementById('principal');
-                const targetId = parentSection.id;
-                
-                // Activar la pestaña correcta
-                document.querySelectorAll('.feed-section').forEach(sec => sec.classList.remove('active'));
-                parentSection.classList.add('active');
-                
-                // Actualizar estilo en la barra lateral
-                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-                const activeLink = document.querySelector(`.sidebar-item[data-target="${targetId}"]`);
-                if(activeLink) activeLink.classList.add('active');
-                
-                // Hacer scroll fluido hasta la tarjeta
-                match.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Aplicar un destello visual temporal
-                match.style.transition = 'all 0.5s';
-                const originalBorder = match.style.borderColor;
-                match.style.borderColor = 'var(--accent-primary)';
-                match.style.boxShadow = '0 0 30px rgba(0, 243, 255, 0.8)';
-                
-                setTimeout(() => {
-                    match.style.borderColor = originalBorder;
-                    match.style.boxShadow = '';
-                }, 2000);
-                
-                showToast(`Encontrado: "${query}"`, 'linear-gradient(135deg, #00f3ff, #0051ff)');
-            } else {
-                showToast(`No se encontraron coincidencia para "${query}".`, '#ff4d4d');
-            }
-        } else {
-            searchInput.focus();
-        }
+        if (!query) { searchInput.focus(); return; }
+        const exactDestination = searchDestinations.find(item => item.label.toLowerCase() === query || item.terms.includes(query));
+        if (exactDestination) { goToSearchTarget(exactDestination.target); showToast(`Abriendo ${exactDestination.label}.`, 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'); return; }
+        const match = Array.from(document.querySelectorAll('.news-card, .post-card, .clip-card')).find(card => card.textContent.toLowerCase().includes(query));
+        if (match) { goToSearchTarget(match.closest('.feed-section')?.id || 'principal', match); showToast(`Encontrado: "${query}"`, 'linear-gradient(135deg, var(--accent-primary), #0051ff)'); return; }
+        renderSearchSuggestions();
     };
-
     if (searchInput && searchBtn) {
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSearch();
-        });
+        searchInput.addEventListener('input', renderSearchSuggestions);
+        searchInput.addEventListener('keypress', event => { if (event.key === 'Enter') handleSearch(); });
         searchBtn.addEventListener('click', handleSearch);
+        document.addEventListener('click', event => { if (!event.target.closest('.nav-center')) closeSearchResults(); });
     }
 
     // --- Interacciones de Publicaciones (Likes, Comentarios, Compartir) ---
@@ -996,7 +1296,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.classList.add('active');
                     
                     const targetId = btn.getAttribute('data-target');
-                    openMDIWindow(targetId);
+                    const targetSection = document.getElementById(targetId);
+                    document.querySelectorAll('.feed-section').forEach(section => section.classList.remove('active', 'floating-window', 'minimized'));
+                    if (targetSection) targetSection.classList.add('active');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     
                     // Populate Community Viewer
                     const cIndex = parseInt(btn.getAttribute('data-comindex'));
@@ -1006,6 +1309,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('comViewCategory').textContent = cData.category;
                         document.getElementById('comViewDesc').textContent = cData.description;
                         document.getElementById('comViewAvatar').src = cData.avatar;
+                        const memberCount = document.getElementById('comViewMemberCount');
+                        if (memberCount) memberCount.textContent = cData.members || 1;
+                        const joinButton = document.getElementById('comJoinButton');
+                        if (joinButton) {
+                            joinButton.dataset.joined = cData.joined === false ? 'false' : 'true';
+                            joinButton.innerHTML = cData.joined === false ? '<i class="fa-solid fa-user-plus"></i> Unirse' : '<i class="fa-solid fa-check"></i> Siguiendo';
+                        }
                         
                         if(cData.banner) {
                             document.getElementById('comViewCover').style.background = `url(${cData.banner}) center/cover no-repeat`;
@@ -1040,7 +1350,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 category: catStr,
                 description: descStr,
                 avatar: currentComAvatarData || defAvatar,
-                banner: currentComBannerData
+                banner: currentComBannerData,
+                members: 1,
+                joined: true
             };
             
             const coms = JSON.parse(localStorage.getItem('erg_communities')) || [];
@@ -1157,10 +1469,78 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBtn = document.getElementById('openChatBtn');
     const chatModal = document.getElementById('chatModal');
     const closeChatBtn = document.getElementById('closeChatBtn');
+    const minimizeChatBtn = document.getElementById('minimizeChatBtn');
+    const chatSearchInput = document.getElementById('chatSearchInput');
+    const chatCurrentUser = document.getElementById('chatCurrentUser');
+    const chatWelcome = document.getElementById('chatWelcome');
+    const chatConversation = document.getElementById('chatConversation');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatCompose = document.getElementById('chatCompose');
+    const chatMessageInput = document.getElementById('chatMessageInput');
+    const newChatBtn = document.getElementById('newChatBtn');
 
     if (chatBtn && chatModal && closeChatBtn) {
         chatBtn.addEventListener('click', () => chatModal.classList.toggle('active'));
         closeChatBtn.addEventListener('click', () => chatModal.classList.remove('active'));
+    }
+
+    if (minimizeChatBtn && chatModal) {
+        minimizeChatBtn.addEventListener('click', () => chatModal.classList.toggle('minimized'));
+    }
+
+    const openConversation = (item) => {
+        if (!chatCurrentUser || !chatWelcome || !chatConversation || !chatMessages) return;
+        const nickname = item.dataset.nickname;
+        chatCurrentUser.textContent = nickname;
+        chatWelcome.hidden = true;
+        chatConversation.hidden = false;
+        chatMessages.innerHTML = `<div class="chat-bubble received">${escapeHTML(item.dataset.message || '¡Hola!')}</div><div class="chat-bubble sent">¡Qué tal! Nos vemos en la próxima partida.</div>`;
+        document.querySelectorAll('.chat-item').forEach(chatItem => chatItem.classList.toggle('selected', chatItem === item));
+        if (chatModal) chatModal.classList.remove('minimized');
+    };
+
+    document.querySelectorAll('.chat-item').forEach(item => item.addEventListener('click', () => openConversation(item)));
+    if (newChatBtn) {
+        newChatBtn.addEventListener('click', () => {
+            const firstChat = document.querySelector('.chat-item:not([hidden])');
+            if (firstChat) openConversation(firstChat);
+        });
+    }
+    if (chatSearchInput) {
+        chatSearchInput.addEventListener('input', () => {
+            const query = chatSearchInput.value.trim().toLowerCase();
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.hidden = query && !item.dataset.nickname.toLowerCase().includes(query);
+            });
+        });
+    }
+    if (chatCompose) {
+        chatCompose.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const message = chatMessageInput.value.trim();
+            if (!message || !chatMessages) return;
+            chatMessages.insertAdjacentHTML('beforeend', `<div class="chat-bubble sent">${escapeHTML(message)}</div>`);
+            chatMessageInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+    }
+
+    const comJoinButton = document.getElementById('comJoinButton');
+    if (comJoinButton) {
+        comJoinButton.addEventListener('click', () => {
+            const index = window.currentActiveCommunityIndex;
+            const communities = JSON.parse(localStorage.getItem('erg_communities')) || [];
+            const community = communities[index];
+            if (!community) return;
+            community.joined = community.joined === false;
+            community.members = Math.max(1, (community.members || 1) + (community.joined ? 1 : -1));
+            communities[index] = community;
+            localStorage.setItem('erg_communities', JSON.stringify(communities));
+            document.getElementById('comViewMemberCount').textContent = community.members;
+            comJoinButton.dataset.joined = community.joined;
+            comJoinButton.innerHTML = community.joined ? '<i class="fa-solid fa-check"></i> Siguiendo' : '<i class="fa-solid fa-user-plus"></i> Unirse';
+            showToast(community.joined ? 'Ahora sigues esta comunidad.' : 'Has salido de la comunidad.', 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))');
+        });
     }
 
     // --- Draggable Modals Logic ---

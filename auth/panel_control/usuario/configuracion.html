@@ -12,18 +12,22 @@
             --accent-primary: #00f3ff;
             --accent-secondary: #ff00e5;
             --user-bg: #05070a;
-            --user-card-bg: rgba(15, 20, 25, 0.9);
+            --user-card-bg: color-mix(in srgb, var(--bg-secondary) 90%, transparent);
             --glow-opacity: 1;
+            --theme-soft: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+            --theme-panel: color-mix(in srgb, var(--bg-secondary) 82%, transparent);
+            --theme-line: color-mix(in srgb, var(--accent-primary) 32%, var(--border-subtle));
         }
 
         * { box-sizing: border-box; }
 
         body {
             background: var(--user-bg);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 114, 255, 0.05) 0%, transparent 40%);
-            color: #fff;
+            background-image:
+                radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--accent-primary) 42%, transparent) 0%, transparent 34%),
+                radial-gradient(circle at 92% 18%, color-mix(in srgb, var(--accent-secondary) 38%, transparent) 0%, transparent 36%),
+                linear-gradient(135deg, color-mix(in srgb, var(--accent-primary) 10%, var(--user-bg)), var(--user-bg) 48%, color-mix(in srgb, var(--accent-secondary) 12%, var(--user-bg)));
+            color: var(--text-primary);
             font-family: 'Outfit', sans-serif;
             margin: 0;
             display: flex;
@@ -32,9 +36,9 @@
 
         .settings-sidebar {
             width: 280px;
-            background: rgba(10, 12, 15, 0.8);
+            background: color-mix(in srgb, var(--bg-main) 78%, #000 22%);
             backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid var(--theme-line);
             padding: 30px;
             display: flex;
             flex-direction: column;
@@ -43,14 +47,14 @@
         }
 
         .user-preview { text-align: center; margin-bottom: 40px; }
-        .user-avatar { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent-primary); padding: 3px; margin-bottom: 15px; box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); object-fit: cover;}
+        .user-avatar { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent-primary); padding: 3px; margin-bottom: 15px; box-shadow: 0 0 15px color-mix(in srgb, var(--accent-primary) 30%, transparent); object-fit: cover;}
         .user-info h3 { margin: 0; font-size: 18px; }
-        .user-info p { margin: 5px 0 0 0; font-size: 13px; color: #808080; }
+        .user-info p { margin: 5px 0 0 0; font-size: 13px; color: var(--text-secondary); }
 
         .settings-nav { list-style: none; padding: 0; margin: 0; }
         .settings-nav li { margin-bottom: 5px; }
         .settings-nav a {
-            color: #a0a0a0;
+            color: var(--text-secondary);
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -60,7 +64,7 @@
             transition: all 0.3s;
             cursor: pointer;
         }
-        .settings-nav a:hover, .settings-nav a.active { background: rgba(0, 243, 255, 0.08); color: var(--accent-primary); }
+        .settings-nav a:hover, .settings-nav a.active { background: var(--theme-soft); color: var(--accent-primary); }
 
         .settings-content { margin-left: 280px; flex-grow: 1; padding: 50px; max-width: 900px; }
         .settings-section { display: none; animation: fadeIn 0.4s ease; }
@@ -70,32 +74,59 @@
 
         .section-header { margin-bottom: 40px; }
         .section-header h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
-        .section-header p { color: #808080; }
+        .section-header p { color: var(--text-secondary); }
 
         .form-group { margin-bottom: 25px; }
-        .form-group label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 600; color: #ccc; }
-        .form-control { width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; color: white; font-family: inherit; transition: all 0.3s; }
-        .form-control:focus { outline: none; border-color: var(--accent-primary); background: rgba(255, 255, 255, 0.05); box-shadow: 0 0 10px rgba(0, 243, 255, 0.1); }
+        .form-group label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .form-control { width: 100%; background: var(--theme-panel); border: 1px solid var(--theme-line); border-radius: 10px; padding: 12px 15px; color: var(--text-primary); font-family: inherit; transition: all 0.3s; }
+        .form-control:focus { outline: none; border-color: var(--accent-primary); background: color-mix(in srgb, var(--accent-primary) 8%, var(--bg-secondary)); box-shadow: 0 0 10px color-mix(in srgb, var(--accent-primary) 18%, transparent); }
 
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
-        .option-card { background: var(--user-card-bg); border: 1px solid rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.3s; }
-        .option-card:hover { border-color: var(--accent-primary); background: rgba(0, 243, 255, 0.03); transform: translateY(-2px); }
-        .option-icon { width: 45px; height: 45px; background: rgba(0, 243, 255, 0.1); color: var(--accent-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .option-card { background: var(--theme-panel); border: 1px solid var(--theme-line); padding: 20px; border-radius: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.3s; }
+        .option-card:hover { border-color: var(--accent-primary); background: var(--theme-soft); transform: translateY(-2px); }
+        .option-icon { width: 45px; height: 45px; background: color-mix(in srgb, var(--accent-primary) 14%, var(--bg-main)); color: var(--accent-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .option-info h4 { margin: 0; font-size: 15px; }
-        .option-info p { margin: 3px 0 0 0; font-size: 12px; color: #606060; }
+        .option-info p { margin: 3px 0 0 0; font-size: 12px; color: var(--text-secondary); }
 
         .btn-save { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 20px; }
-        .btn-save:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(0, 243, 255, 0.3); }
+        .btn-save:hover { transform: scale(1.05); box-shadow: 0 5px 20px color-mix(in srgb, var(--accent-primary) 35%, transparent); }
+        .settings-form { max-width: 620px; }
+        .settings-form .form-group { margin-bottom: 18px; }
+        .settings-form small { display: block; color: var(--text-secondary); margin-top: 6px; font-size: 12px; }
+        .settings-message { min-height: 20px; margin: 14px 0 0; color: var(--accent-primary); font-size: 13px; font-weight: 600; }
+        .settings-message.error { color: #ff6b6b; }
+        .settings-list { max-width: 620px; }
+        .settings-list .option-card { cursor: default; }
+        .settings-list .option-info { flex: 1; }
+        .danger-panel { max-width: 620px; padding: 22px; border: 1px solid color-mix(in srgb, var(--accent-secondary) 55%, var(--border-subtle)); border-radius: 15px; background: color-mix(in srgb, var(--accent-secondary) 8%, var(--bg-secondary)); }
+        .danger-panel h2 { margin: 0 0 8px; color: var(--accent-secondary); font-size: 20px; }
+        .danger-panel p { color: var(--text-secondary); margin: 0 0 20px; }
+        .danger-panel label { display: block; color: var(--text-primary); font-weight: 600; margin-bottom: 8px; }
+        .danger-panel select { margin-bottom: 14px; }
+        .danger-confirm { display: flex; align-items: flex-start; gap: 9px; color: var(--text-secondary); font-size: 13px; line-height: 1.4; }
+        .danger-confirm input { accent-color: var(--accent-secondary); margin-top: 3px; }
+        .btn-danger { margin-top: 18px; padding: 11px 20px; border: 1px solid var(--accent-secondary); border-radius: 9px; background: color-mix(in srgb, var(--accent-secondary) 18%, var(--bg-main)); color: var(--text-primary); font: inherit; font-weight: 700; cursor: pointer; transition: .2s ease; }
+        .btn-danger:hover:not(:disabled) { background: var(--accent-secondary); box-shadow: 0 0 18px color-mix(in srgb, var(--accent-secondary) 35%, transparent); }
+        .btn-danger:disabled { opacity: .45; cursor: not-allowed; }
 
-        .back-dashboard { position: fixed; top: 20px; right: 40px; color: #606060; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: color 0.3s; z-index: 1000; }
+        .danger-link { color: var(--accent-secondary) !important; }
+        .danger-link:hover { background: color-mix(in srgb, var(--accent-secondary) 12%, transparent) !important; color: var(--text-primary) !important; }
+        .back-dashboard { position: fixed; top: 20px; right: 40px; color: var(--text-secondary); text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: color 0.3s; z-index: 1000; }
         .back-dashboard:hover { color: var(--accent-primary); }
 
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; margin-left: auto; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-tertiary); transition: .4s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent-primary); }
         input:checked + .slider:before { transform: translateX(20px); }
+        .theme-swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; max-width: 620px; margin-top: 18px; }
+        .theme-swatch { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 10px; color: var(--text-primary); background: var(--theme-panel); border: 1px solid var(--theme-line); border-radius: 10px; cursor: pointer; text-align: left; transition: .2s ease; }
+        .theme-swatch:hover, .theme-swatch.active { border-color: var(--accent-primary); transform: translateY(-2px); box-shadow: 0 0 16px color-mix(in srgb, var(--accent-primary) 18%, transparent); }
+        .theme-swatch span { width: 25px; height: 25px; flex: 0 0 25px; border-radius: 7px; background: linear-gradient(135deg, var(--swatch-one), var(--swatch-two)); box-shadow: 0 0 10px var(--swatch-one); }
+        .theme-swatch strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+        .theme-swatch-blue { --swatch-one: #00f3ff; --swatch-two: #246bff; } .theme-swatch-red { --swatch-one: #ff365f; --swatch-two: #b026ff; } .theme-swatch-gold { --swatch-one: #ffcf33; --swatch-two: #ff6b35; } .theme-swatch-green { --swatch-one: #00f59b; --swatch-two: #00b8d9; } .theme-swatch-purple { --swatch-one: #b977ff; --swatch-two: #ff4fd8; } .theme-swatch-orange { --swatch-one: #ff7a18; --swatch-two: #ff1744; } .theme-swatch-ice { --swatch-one: #f5fbff; --swatch-two: #62d9ff; } .theme-swatch-lime { --swatch-one: #d7ff3f; --swatch-two: #00c853; }
+        @media (max-width: 700px) { .theme-swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     </style>
 </head>
 <body>
@@ -118,7 +149,7 @@
             <li><a class="nav-link active" data-target="personalizacion"><i class="fa-solid fa-wand-magic-sparkles"></i> Personalización</a></li>
             <li><a class="nav-link" data-target="seguridad"><i class="fa-solid fa-shield-halved"></i> Seguridad</a></li>
             <li><a class="nav-link" data-target="notificaciones"><i class="fa-solid fa-bell-concierge"></i> Notificaciones</a></li>
-            <li><a class="nav-link" style="margin-top: 10px; color: #ff4d4d;"><i class="fa-solid fa-trash"></i> Eliminar Cuenta</a></li>
+            <li><a class="nav-link danger-link" data-target="eliminar-cuenta" style="margin-top: 10px;"><i class="fa-solid fa-trash"></i> Eliminar Cuenta</a></li>
         </ul>
 
     </aside>
@@ -137,7 +168,21 @@
                     <option value="vampire-red">Vampire Red</option>
                     <option value="cyberpunk-gold">Cyberpunk Gold</option>
                     <option value="emerald-green">Emerald Green</option>
+                    <option value="space-purple">Space Purple</option>
+                    <option value="inferno-orange">Inferno Orange</option>
+                    <option value="ice-white">Ice White</option>
+                    <option value="toxic-lime">Toxic Lime</option>
                 </select>
+            </div>
+            <div class="theme-swatches" id="themeSwatches" aria-label="Temas disponibles">
+                <button type="button" class="theme-swatch theme-swatch-blue" data-theme="neon-blue"><span></span><strong>Neon Blue</strong></button>
+                <button type="button" class="theme-swatch theme-swatch-red" data-theme="vampire-red"><span></span><strong>Vampire Red</strong></button>
+                <button type="button" class="theme-swatch theme-swatch-gold" data-theme="cyberpunk-gold"><span></span><strong>Cyberpunk Gold</strong></button>
+                <button type="button" class="theme-swatch theme-swatch-green" data-theme="emerald-green"><span></span><strong>Emerald Green</strong></button>
+                <button type="button" class="theme-swatch theme-swatch-purple" data-theme="space-purple"><span></span><strong>Space Purple</strong></button>
+                <button type="button" class="theme-swatch theme-swatch-orange" data-theme="inferno-orange"><span></span><strong>Inferno Orange</strong></button>
+                <button type="button" class="theme-swatch theme-swatch-ice" data-theme="ice-white"><span></span><strong>Ice White</strong></button>
+                <button type="button" class="theme-swatch theme-swatch-lime" data-theme="toxic-lime"><span></span><strong>Toxic Lime</strong></button>
             </div>
             <div class="card-grid" style="margin-top: 20px;">
                 <div class="option-card">
@@ -170,19 +215,82 @@
         <section id="seguridad" class="settings-section">
             <div class="section-header">
                 <h1>Seguridad</h1>
-                <p>Gestiona el acceso a tu cuenta.</p>
+                <p>Gestiona la protección y el acceso a tu cuenta.</p>
             </div>
-            <!-- ... (contenido de seguridad) ... -->
-            <button type="button" class="btn-save">Actualizar Seguridad</button>
+            <form class="settings-form" id="securityForm">
+                <div class="form-group">
+                    <label for="currentPassword">Contraseña actual</label>
+                    <input class="form-control" type="password" id="currentPassword" autocomplete="current-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Nueva contraseña</label>
+                    <input class="form-control" type="password" id="newPassword" minlength="6" autocomplete="new-password" required>
+                    <small>Usa al menos 6 caracteres.</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar nueva contraseña</label>
+                    <input class="form-control" type="password" id="confirmPassword" minlength="6" autocomplete="new-password" required>
+                </div>
+                <label class="option-card">
+                    <span class="option-icon"><i class="fa-solid fa-bell"></i></span>
+                    <span class="option-info">
+                        <strong>Avisos de inicio de sesión</strong>
+                        <small>Recibe un aviso cuando se detecte un nuevo acceso.</small>
+                    </span>
+                    <span class="switch"><input type="checkbox" id="loginAlerts"><span class="slider"></span></span>
+                </label>
+                <button type="submit" class="btn-save">Actualizar Seguridad</button>
+                <p class="settings-message" id="securityMessage" role="status"></p>
+            </form>
         </section>
 
         <!-- SECCIÓN NOTIFICACIONES -->
         <section id="notificaciones" class="settings-section">
             <div class="section-header">
                 <h1>Notificaciones</h1>
-                <p>Configura tus alertas.</p>
+                <p>Elige qué avisos quieres recibir.</p>
             </div>
-            <!-- ... (contenido de notificaciones) ... -->
+            <div class="settings-list">
+                <label class="option-card">
+                    <span class="option-icon"><i class="fa-solid fa-users"></i></span>
+                    <span class="option-info"><strong>Actividad de la comunidad</strong><small>Nuevas publicaciones y respuestas.</small></span>
+                    <span class="switch"><input type="checkbox" id="communityNotifications"><span class="slider"></span></span>
+                </label>
+                <label class="option-card">
+                    <span class="option-icon"><i class="fa-solid fa-comments"></i></span>
+                    <span class="option-info"><strong>Mensajes directos</strong><small>Avisos cuando recibas un mensaje.</small></span>
+                    <span class="switch"><input type="checkbox" id="messageNotifications"><span class="slider"></span></span>
+                </label>
+                <label class="option-card">
+                    <span class="option-icon"><i class="fa-solid fa-trophy"></i></span>
+                    <span class="option-info"><strong>Eventos y logros</strong><small> novedades sobre eventos y recompensas.</small></span>
+                    <span class="switch"><input type="checkbox" id="eventNotifications"><span class="slider"></span></span>
+                </label>
+                <button type="button" class="btn-save" id="btnSaveNotifications">Guardar Notificaciones</button>
+                <p class="settings-message" id="notificationsMessage" role="status"></p>
+            </div>
+        </section>
+
+        <section id="eliminar-cuenta" class="settings-section">
+            <div class="section-header">
+                <h1>Eliminar Cuenta</h1>
+                <p>Esta acción borra la sesión y los datos guardados en este dispositivo.</p>
+            </div>
+            <div class="danger-panel">
+                <h2>¿Quieres borrar tu cuenta?</h2>
+                <p>Selecciona un motivo y confirma para eliminar tu perfil, preferencias, publicaciones y configuraciones locales.</p>
+                <label for="deleteReason">Motivo de eliminación</label>
+                <select class="form-control" id="deleteReason">
+                    <option value="">Selecciona una opción</option>
+                    <option>Ya no utilizo ERG</option>
+                    <option>Problemas con mi cuenta</option>
+                    <option>Privacidad</option>
+                    <option>Otro motivo</option>
+                </select>
+                <label class="danger-confirm"><input type="checkbox" id="confirmDelete"> Entiendo que esta acción es permanente y quiero eliminar mi cuenta.</label>
+                <button type="button" class="btn-danger" id="btnDeleteAccount" disabled><i class="fa-solid fa-trash"></i> Eliminar cuenta definitivamente</button>
+                <p class="settings-message error" id="deleteMessage" role="status"></p>
+            </div>
         </section>
     </main>
 
@@ -208,6 +316,17 @@
                 });
             });
 
+            const activateSection = (target) => {
+                const section = document.getElementById(target);
+                const link = document.querySelector(`.nav-link[data-target="${target}"]`);
+                if (!section || !link) return;
+                navLinks.forEach(item => item.classList.remove('active'));
+                sections.forEach(item => item.classList.remove('active'));
+                link.classList.add('active');
+                section.classList.add('active');
+            };
+            if (window.location.hash === '#eliminar-cuenta') activateSection('eliminar-cuenta');
+
             // Personalización Logic
             const themeSelect = document.getElementById('themeSelect');
             const checkGamerCursor = document.getElementById('checkGamerCursor');
@@ -221,19 +340,48 @@
 
             const applyThemeVars = (s) => {
                 const root = document.documentElement;
-                if(s.theme === 'vampire-red') root.style.setProperty('--accent-primary', '#ff003c');
-                else if(s.theme === 'cyberpunk-gold') root.style.setProperty('--accent-primary', '#ffb700');
-                else if(s.theme === 'emerald-green') root.style.setProperty('--accent-primary', '#00ff88');
-                else root.style.setProperty('--accent-primary', '#00f3ff');
+                const cursorUrl = 'url("https://cur.cursors-4u.net/games/gam-4/gam372.cur")';
+                const themes = {
+                    'neon-blue': ['#00f3ff', '#246bff', '#101622', '#182234', '#202d42', '#f2f7ff', '#93a4bd', '#30435e'],
+                    'vampire-red': ['#ff365f', '#b026ff', '#1c1018', '#291522', '#3b1b2e', '#fff3f6', '#c59eaa', '#5a2a43'],
+                    'cyberpunk-gold': ['#ffcf33', '#ff6b35', '#181714', '#27231a', '#383020', '#fff9df', '#c1b58c', '#5c4b27'],
+                    'emerald-green': ['#00f59b', '#00b8d9', '#0d1b1a', '#142824', '#1d3933', '#e9fff8', '#8eb5a9', '#2d5c50'],
+                    'space-purple': ['#b977ff', '#ff4fd8', '#151225', '#211a38', '#30244e', '#f8f1ff', '#b9a9d0', '#4d3974'],
+                    'inferno-orange': ['#ff7a18', '#ff1744', '#21120d', '#321b12', '#4b2618', '#fff5ed', '#d6a58a', '#713c25'],
+                    'ice-white': ['#62d9ff', '#f5fbff', '#101a24', '#1b2b3a', '#294358', '#f5fbff', '#a9c4d4', '#42677e'],
+                    'toxic-lime': ['#d7ff3f', '#00c853', '#111a12', '#1c2a1b', '#2a4028', '#f5ffe2', '#a8be91', '#527342']
+                };
+                const palette = themes[s.theme] || themes['neon-blue'];
+                ['--accent-primary', '--accent-secondary', '--bg-main', '--bg-secondary', '--bg-tertiary', '--text-primary', '--text-secondary', '--border-subtle']
+                    .forEach((variable, index) => root.style.setProperty(variable, palette[index]));
+                root.style.setProperty('--user-bg', palette[2]);
+                root.style.setProperty('--user-card-bg', palette[3]);
                 
                 root.style.setProperty('--glow-opacity', s.glowEffect ? '1' : '0');
                 if(s.gamerCursor) {
-                    document.body.style.cursor = 'url("https://cur.cursors-4u.net/games/gam-4/gam372.cur"), auto';
+                    let cursorStyle = document.getElementById('cursor-style');
+                    if (!cursorStyle) {
+                        cursorStyle = document.createElement('style');
+                        cursorStyle.id = 'cursor-style';
+                        document.head.appendChild(cursorStyle);
+                    }
+                    cursorStyle.textContent = `* { cursor: ${cursorUrl}, auto !important; } a, button, select, input, [role="button"] { cursor: ${cursorUrl}, pointer !important; }`;
                 } else {
-                    document.body.style.cursor = 'default';
+                    const cursorStyle = document.getElementById('cursor-style');
+                    if (cursorStyle) cursorStyle.remove();
                 }
             };
             applyThemeVars(settings);
+
+            document.querySelectorAll('.theme-swatch').forEach((swatch) => {
+                swatch.classList.toggle('active', swatch.dataset.theme === settings.theme);
+                swatch.addEventListener('click', () => {
+                    themeSelect.value = swatch.dataset.theme;
+                    document.querySelectorAll('.theme-swatch').forEach((item) => item.classList.remove('active'));
+                    swatch.classList.add('active');
+                    applyThemeVars({ ...settings, theme: swatch.dataset.theme });
+                });
+            });
 
             btnSaveConfig.addEventListener('click', () => {
                 const newSettings = {
@@ -243,8 +391,84 @@
                 };
                 localStorage.setItem('erg_settings', JSON.stringify(newSettings));
                 applyThemeVars(newSettings);
+                document.querySelectorAll('.theme-swatch').forEach((swatch) => swatch.classList.toggle('active', swatch.dataset.theme === newSettings.theme));
                 btnSaveConfig.textContent = 'Guardado!';
                 setTimeout(() => btnSaveConfig.textContent = 'Guardar Configuración', 2000);
+            });
+
+            const securityForm = document.getElementById('securityForm');
+            const securityMessage = document.getElementById('securityMessage');
+            const loginAlerts = document.getElementById('loginAlerts');
+            const security = JSON.parse(localStorage.getItem('erg_security')) || { password: '', loginAlerts: true };
+            loginAlerts.checked = security.loginAlerts;
+
+            securityForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                securityMessage.classList.remove('error');
+                if (security.password && currentPassword !== security.password) {
+                    securityMessage.textContent = 'La contraseña actual no es correcta.';
+                    securityMessage.classList.add('error');
+                    return;
+                }
+                if (newPassword.length < 6 || newPassword !== confirmPassword) {
+                    securityMessage.textContent = 'La nueva contraseña debe tener 6 caracteres y coincidir.';
+                    securityMessage.classList.add('error');
+                    return;
+                }
+
+                security.password = newPassword;
+                security.loginAlerts = loginAlerts.checked;
+                localStorage.setItem('erg_security', JSON.stringify(security));
+                securityForm.reset();
+                loginAlerts.checked = security.loginAlerts;
+                securityMessage.textContent = 'Seguridad actualizada correctamente.';
+            });
+
+            const notificationInputs = {
+                community: document.getElementById('communityNotifications'),
+                messages: document.getElementById('messageNotifications'),
+                events: document.getElementById('eventNotifications')
+            };
+            const notificationSettings = JSON.parse(localStorage.getItem('erg_notifications')) || {
+                community: true,
+                messages: true,
+                events: false
+            };
+            Object.keys(notificationInputs).forEach((key) => {
+                notificationInputs[key].checked = notificationSettings[key];
+            });
+
+            document.getElementById('btnSaveNotifications').addEventListener('click', () => {
+                const newNotificationSettings = Object.fromEntries(
+                    Object.entries(notificationInputs).map(([key, input]) => [key, input.checked])
+                );
+                localStorage.setItem('erg_notifications', JSON.stringify(newNotificationSettings));
+                const notificationsMessage = document.getElementById('notificationsMessage');
+                notificationsMessage.classList.remove('error');
+                notificationsMessage.textContent = 'Preferencias de notificaciones guardadas.';
+            });
+
+            const deleteReason = document.getElementById('deleteReason');
+            const confirmDelete = document.getElementById('confirmDelete');
+            const btnDeleteAccount = document.getElementById('btnDeleteAccount');
+            const deleteMessage = document.getElementById('deleteMessage');
+            const updateDeleteState = () => { btnDeleteAccount.disabled = !deleteReason.value || !confirmDelete.checked; };
+            deleteReason.addEventListener('change', updateDeleteState);
+            confirmDelete.addEventListener('change', updateDeleteState);
+            btnDeleteAccount.addEventListener('click', () => {
+                if (btnDeleteAccount.disabled) return;
+                localStorage.removeItem('erg_profile');
+                localStorage.removeItem('erg_settings');
+                localStorage.removeItem('erg_security');
+                localStorage.removeItem('erg_notifications');
+                localStorage.removeItem('erg_posts');
+                localStorage.removeItem('erg_comments');
+                deleteMessage.textContent = 'Cuenta eliminada. Redirigiendo...';
+                setTimeout(() => window.location.replace('../../../auth/login.html'), 700);
             });
         });
     </script>

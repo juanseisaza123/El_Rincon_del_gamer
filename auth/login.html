@@ -26,39 +26,32 @@
             la <a href="#" class="link">Política de privacidad</a>.
         </p>
 
-        <div class="auth-buttons">
-            <button type="button" class="btn-auth">
-                <span class="btn-text">Continuar con el Correo Electrónico</span>
-            </button>
-            <button type="button" class="btn-auth">
-                <span class="btn-text">Continuar con el Número de Teléfono</span>
-            </button>
-        </div>
-
-        <hr class="separator">
-
         <form id="loginForm">
             <div class="input-group">
-                <input type="text" id="username" placeholder="Correo electrónico o nombre de usuario*" required>
+                <input type="email" id="email" placeholder="Correo electrónico*" autocomplete="email" required>
             </div>
             <div class="input-group">
-                <input type="password" id="password" placeholder="Contraseña*" required>
+                <input type="password" id="password" placeholder="Contraseña*" autocomplete="current-password" minlength="6" required>
             </div>
 
             <div class="form-footer">
-                <a href="#" class="forgot-password">¿Has olvidado tu contraseña?</a>
-
-                <p class="register-text">
+                <p class="register-text" id="registerPrompt">
                     ¿Es tu primera vez en ERG? <a href="#" class="link">Regístrate</a>
+                </p>
+                <p class="register-text" id="loginPrompt" hidden>
+                    ¿Ya tienes cuenta? <a href="#" class="link">Inicia sesión</a>
                 </p>
             </div>
 
             <button type="submit" class="btn-submit">
                 <span>Iniciar sesión</span>
             </button>
+            <p id="authMessage" role="status" aria-live="polite"></p>
         </form>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/assets/js/lib/supabaseClient.js"></script>
     <script src="assets/js/login.js"></script>
 </body>
 
